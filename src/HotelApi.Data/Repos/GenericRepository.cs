@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using HotelApi.src.HotelApi.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 namespace HotelApi.src.HotelApi.Data.Repos;
@@ -17,4 +18,6 @@ public class GenericRepository<T> where T : class
     public async Task AddAsync(T entity) => await _dbSet.AddAsync(entity);
     public void Remove(T entity) => _dbSet.Remove(entity);
     public async Task SaveAsync() => await _context.SaveChangesAsync();
+    public void Update(T entity) => _dbSet.Update(entity);
+    public void Delete(T entity) => _dbSet.Remove(entity);
 }
