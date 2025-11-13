@@ -14,5 +14,5 @@ public class Room
     [Column(TypeName = "decimal(10,2)")] public decimal PricePerNight;
     public string? Amenities { get; set; }
     public bool Active { get; set; } = true;
-    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public ICollection<Booking> Bookings { get; set; } = [];
 }
