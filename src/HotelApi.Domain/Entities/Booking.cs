@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using HotelApi.src.HotelApi.Domain.Enums;
+
 namespace HotelApi.src.HotelApi.Domain.Entities;
 
 public class Booking
@@ -10,6 +13,9 @@ public class Booking
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public int NumPersons { get; set; }
+    public BookingStatus Status { get; set; } = BookingStatus.Pending;
+    [Column(TypeName = "decimal(10,2)")]
+    public decimal TotalPrice { get; set; }
     public int ExtraBedsCount { get; set; } = 0;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
