@@ -28,7 +28,8 @@ public class InvoiceService(IGenericRepository<Invoice> invoiceRepository, IGene
             BookingId = bookingId,
             AmountDue = amount,
             IssueDate = DateTime.UtcNow,
-            Status = InvoiceStatus.Unpaid
+            Status = InvoiceStatus.Unpaid,
+            Payments= []
         };
 
         await _invoiceRepository.AddAsync(invoice);
