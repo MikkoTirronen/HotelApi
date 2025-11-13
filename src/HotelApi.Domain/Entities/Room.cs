@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using HotelApi.src.HotelApi.Domain.Enums;
 
 
-namespace HotelApi.Data.Entities;
+namespace HotelApi.src.HotelApi.Domain.Entities;
 
 public class Room
 {

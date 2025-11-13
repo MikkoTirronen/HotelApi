@@ -1,7 +1,6 @@
-using HotelApi.Data.Entities;
+using HotelApi.src.HotelApi.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-
-namespace HotelApi.Data.Contexts;
+namespace HotelApi.src.HotelApi.Data.Contexts;
 
 public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContext(options)
 {

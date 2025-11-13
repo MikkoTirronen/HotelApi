@@ -1,4 +1,4 @@
-namespace HotelApi.Data.Entities;
+namespace HotelApi.src.HotelApi.Domain.Entities;
 
 public class Booking
 {

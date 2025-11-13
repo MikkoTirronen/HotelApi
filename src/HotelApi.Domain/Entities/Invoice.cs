@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using HotelApi.src.HotelApi.Domain.Enums;
 
-namespace HotelApi.Data.Entities;
+namespace HotelApi.src.HotelApi.Domain.Entities;
 
 public class Invoice
 {
@@ -11,5 +12,5 @@ public class Invoice
     public DateTime IssueDate { get; set; } = DateTime.UtcNow;
     public InvoiceStatus Status { get; set; } = InvoiceStatus.Unpaid;
     public ICollection<Booking> Bookings = [];
-    
+
 }

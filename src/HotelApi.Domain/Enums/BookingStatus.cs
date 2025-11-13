@@ -1,4 +1,4 @@
-namespace HotelApi.Data.Entities
+namespace HotelApi.src.HotelApi.Domain.Enums
 {
     public enum BookingStatus { Pending = 0, Confirmed = 1, Canceled = 2, Completed = 3 }
 }

@@ -1,7 +1,6 @@
-using HotelApi.Data.Contexts;
+using HotelApi.src.HotelApi.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
-
-namespace HotelApi.Data.Repos;
+namespace HotelApi.src.HotelApi.Data.Repos;
 
 public class GenericRepository<T> where T : class
 {
