@@ -29,7 +29,7 @@ public class InvoiceService(IGenericRepository<Invoice> invoiceRepository, IGene
             AmountDue = amount,
             IssueDate = DateTime.UtcNow,
             Status = InvoiceStatus.Unpaid,
-            Payments= []
+            Payments = []
         };
 
         await _invoiceRepository.AddAsync(invoice);
@@ -43,7 +43,7 @@ public class InvoiceService(IGenericRepository<Invoice> invoiceRepository, IGene
         if (invoice == null) return false;
 
         invoice.Status = InvoiceStatus.Paid;
-        invoice.PaymentDate = DateTime.UtcNow;
+        invoice.IssueDate = DateTime.UtcNow;
 
         _invoiceRepository.Update(invoice);
         await _invoiceRepository.SaveAsync();

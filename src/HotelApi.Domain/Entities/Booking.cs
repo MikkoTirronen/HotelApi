@@ -14,11 +14,10 @@ public class Booking
     public DateTime EndDate { get; set; }
     public int NumPersons { get; set; }
     public BookingStatus Status { get; set; } = BookingStatus.Pending;
-    [Column(TypeName = "decimal(10,2)")]
-    public decimal TotalPrice { get; set; }
+    [Column(TypeName = "decimal(10,2)")] public decimal TotalPrice { get; set; }
     public int ExtraBedsCount { get; set; } = 0;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-    public int? InvoiceId { get; set; }
+
     public Invoice? Invoice { get; set; }
 }

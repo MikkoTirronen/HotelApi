@@ -13,7 +13,12 @@ public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContex
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Room>().HasIndex(r => r.RoomNumber).IsUnique();
-        modelBuilder.Entity<Invoice>().HasIndex(i => i.BookingId).IsUnique();
+        
+        modelBuilder.Entity<Invoice>()
+            .HasOne(i => i.Booking)
+            .WithOne(b => b.Invoice)
+            .HasForeignKey<Invoice>(i => i.BookingId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Booking>()
             .HasOne(b => b.Customer)

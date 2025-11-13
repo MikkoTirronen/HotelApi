@@ -1,9 +1,10 @@
 using System.Threading.Tasks;
 using HotelApi.src.HotelApi.Data.Contexts;
+using HotelApi.src.HotelApi.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 namespace HotelApi.src.HotelApi.Data.Repos;
 
-public class GenericRepository<T> where T : class
+public class GenericRepository<T> : IGenericRepository<T> where T : class
 {
     private readonly HotelDbContext _context;
     private readonly DbSet<T> _dbSet;
@@ -16,7 +17,6 @@ public class GenericRepository<T> where T : class
     public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.ToListAsync();
     public async Task<T?> GetByIdAsync(int id) => await _dbSet.FindAsync(id);
     public async Task AddAsync(T entity) => await _dbSet.AddAsync(entity);
-    public void Remove(T entity) => _dbSet.Remove(entity);
     public async Task SaveAsync() => await _context.SaveChangesAsync();
     public void Update(T entity) => _dbSet.Update(entity);
     public void Delete(T entity) => _dbSet.Remove(entity);
