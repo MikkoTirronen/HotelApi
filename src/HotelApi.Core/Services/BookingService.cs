@@ -8,12 +8,14 @@ namespace HotelApi.src.HotelApi.Core.Services;
 public class BookingService(
     IGenericRepository<Booking> bookingRepository,
     IGenericRepository<Room> roomRepository,
-    IGenericRepository<Customer> customerRepository
+    IGenericRepository<Customer> customerRepository,
+    IInvoiceService invoiceService
     ) : IBookingService
 {
     private readonly IGenericRepository<Booking> _bookingRepository = bookingRepository;
     private readonly IGenericRepository<Room> _roomRepository = roomRepository;
     private readonly IGenericRepository<Customer> _customerRepository = customerRepository;
+    private readonly IInvoiceService _invoiceService = invoiceService;
 
     public async Task<IEnumerable<Booking>> GetAllBookingsAsync() => await _bookingRepository.GetAllAsync();
     public async Task<Booking?> GetBookingByIdAsync(int id) => await _bookingRepository.GetByIdAsync(id);
@@ -54,6 +56,8 @@ public class BookingService(
         await _bookingRepository.AddAsync(booking);
         await _bookingRepository.SaveAsync();
 
+        await _invoiceService.CreateInvoiceAsync(booking.Id, booking.TotalPrice);
+
         return booking;
     }
 
@@ -86,7 +90,7 @@ public class BookingService(
     {
         var booking = await _bookingRepository.GetByIdAsync(id);
         if (booking == null) return false;
-        
+
         booking.Status = BookingStatus.Canceled;
         _bookingRepository.Update(booking);
         await _bookingRepository.SaveAsync();
