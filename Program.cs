@@ -1,3 +1,4 @@
+using HotelApi.src.HotelApi.Api.Endpoints;
 using HotelApi.src.HotelApi.Core.Interfaces;
 using HotelApi.src.HotelApi.Core.Services;
 using HotelApi.src.HotelApi.Data.Contexts;
@@ -15,7 +16,28 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+using(var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<HotelDbContext>();
+    db.Database.Migrate();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.MapRoomEndpoints();
+app.MapBookingEndpoints();
+app.MapInvoiceEndpoints();
+app.MapPaymentEndpoints();
 
 app.Run();

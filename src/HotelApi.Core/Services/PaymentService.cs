@@ -1,10 +1,11 @@
+using HotelApi.src.HotelApi.Core.Interfaces;
 using HotelApi.src.HotelApi.Data.Interfaces;
 using HotelApi.src.HotelApi.Domain.Entities;
 using HotelApi.src.HotelApi.Domain.Enums;
 
 namespace HotelApi.src.HotelApi.Core.Services
 {
-    public class PaymentService(IGenericRepository<PaymentRecord> paymentRepo, IGenericRepository<Invoice> invoiceRepo)
+    public class PaymentService(IGenericRepository<PaymentRecord> paymentRepo, IGenericRepository<Invoice> invoiceRepo):IPaymentService
     {
         private readonly IGenericRepository<PaymentRecord> _paymentRepo = paymentRepo;
         private readonly IGenericRepository<Invoice> _invoiceRepo = invoiceRepo;
