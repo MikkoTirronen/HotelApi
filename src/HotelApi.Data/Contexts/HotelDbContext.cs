@@ -12,7 +12,7 @@ public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContex
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Room>().HasIndex(r => r.Number).IsUnique();
+        modelBuilder.Entity<Room>().HasIndex(r => r.RoomNumber).IsUnique();
         modelBuilder.Entity<Invoice>().HasIndex(i => i.BookingId).IsUnique();
 
         modelBuilder.Entity<Booking>()

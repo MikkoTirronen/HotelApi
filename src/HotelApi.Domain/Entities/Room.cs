@@ -8,7 +8,7 @@ namespace HotelApi.src.HotelApi.Domain.Entities;
 public class Room
 {
     public int Id { get; set; }
-    [Required] public string Number { get; set; } = null!;
+    [Required] public string RoomNumber { get; set; } = null!;
     public RoomType Type { get; set; }
     public int BaseCapacity { get; set; }
     public int MaxExtraBeds { get; set; }
