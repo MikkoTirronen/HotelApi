@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HotelApi.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    [Migration("20251113225746_FixOneToOneBookingInvoice")]
-    partial class FixOneToOneBookingInvoice
+    [Migration("20251116215835_InitialBuild")]
+    partial class InitialBuild
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,6 +45,9 @@ namespace HotelApi.Migrations
                     b.Property<int>("ExtraBedsCount")
                         .HasColumnType("integer");
 
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("NumPersons")
                         .HasColumnType("integer");
 
@@ -70,6 +73,38 @@ namespace HotelApi.Migrations
                     b.HasIndex("RoomId");
 
                     b.ToTable("Bookings");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2025, 1, 11, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 1,
+                            EndDate = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ExtraBedsCount = 0,
+                            InvoiceId = 1,
+                            NumPersons = 2,
+                            RoomId = 1,
+                            StartDate = new DateTime(2024, 2, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1,
+                            TotalPrice = 240m,
+                            UpdatedAt = new DateTime(2025, 1, 11, 0, 0, 0, 0, DateTimeKind.Utc)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2025, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CustomerId = 2,
+                            EndDate = new DateTime(2024, 3, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ExtraBedsCount = 1,
+                            InvoiceId = 2,
+                            NumPersons = 3,
+                            RoomId = 2,
+                            StartDate = new DateTime(2024, 3, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 0,
+                            TotalPrice = 500m,
+                            UpdatedAt = new DateTime(2025, 2, 6, 0, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("HotelApi.src.HotelApi.Domain.Entities.Customer", b =>
@@ -89,11 +124,11 @@ namespace HotelApi.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
-                    b.Property<string>("Firstname")
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Lastname")
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -106,6 +141,28 @@ namespace HotelApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "john@example.com",
+                            FirstName = "John",
+                            LastName = "Doe",
+                            Phone = "111-222",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "sarah@example.com",
+                            FirstName = "Sarah",
+                            LastName = "Connor",
+                            Phone = "333-444",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("HotelApi.src.HotelApi.Domain.Entities.Invoice", b =>
@@ -134,6 +191,24 @@ namespace HotelApi.Migrations
                         .IsUnique();
 
                     b.ToTable("Invoices");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AmountDue = 240m,
+                            BookingId = 1,
+                            IssueDate = new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AmountDue = 500m,
+                            BookingId = 2,
+                            IssueDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1
+                        });
                 });
 
             modelBuilder.Entity("HotelApi.src.HotelApi.Domain.Entities.PaymentRecord", b =>
@@ -162,6 +237,16 @@ namespace HotelApi.Migrations
                     b.HasIndex("InvoiceId");
 
                     b.ToTable("Payments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AmountPaid = 240m,
+                            InvoiceId = 1,
+                            PaymentDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = "Credit Card"
+                        });
                 });
 
             modelBuilder.Entity("HotelApi.src.HotelApi.Domain.Entities.Room", b =>
@@ -200,6 +285,38 @@ namespace HotelApi.Migrations
                         .IsUnique();
 
                     b.ToTable("Rooms");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Active = true,
+                            BaseCapacity = 2,
+                            MaxExtraBeds = 0,
+                            PricePerNight = 80m,
+                            RoomNumber = "101",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Active = true,
+                            BaseCapacity = 3,
+                            MaxExtraBeds = 1,
+                            PricePerNight = 100m,
+                            RoomNumber = "102",
+                            Type = 0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Active = true,
+                            BaseCapacity = 4,
+                            MaxExtraBeds = 2,
+                            PricePerNight = 150m,
+                            RoomNumber = "201",
+                            Type = 0
+                        });
                 });
 
             modelBuilder.Entity("HotelApi.src.HotelApi.Domain.Entities.Booking", b =>

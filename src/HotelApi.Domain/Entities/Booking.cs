@@ -16,8 +16,8 @@ public class Booking
     public BookingStatus Status { get; set; } = BookingStatus.Pending;
     [Column(TypeName = "decimal(10,2)")] public decimal TotalPrice { get; set; }
     public int ExtraBedsCount { get; set; } = 0;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
+    public DateTime CreatedAt { get; set; } 
+    public DateTime UpdatedAt { get; set; } 
+    public int InvoiceId { get; set; } 
     public Invoice? Invoice { get; set; }
 }

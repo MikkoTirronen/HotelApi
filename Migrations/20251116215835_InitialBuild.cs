@@ -4,10 +4,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace HotelApi.Migrations
 {
     /// <inheritdoc />
-    public partial class FixOneToOneBookingInvoice : Migration
+    public partial class InitialBuild : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,8 +20,8 @@ namespace HotelApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Firstname = table.Column<string>(type: "text", nullable: false),
-                    Lastname = table.Column<string>(type: "text", nullable: false),
+                    FirstName = table.Column<string>(type: "text", nullable: false),
+                    LastName = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: true),
                     Phone = table.Column<string>(type: "text", nullable: true),
                     Address = table.Column<string>(type: "text", nullable: true),
@@ -65,7 +67,8 @@ namespace HotelApi.Migrations
                     TotalPrice = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
                     ExtraBedsCount = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    InvoiceId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -127,6 +130,48 @@ namespace HotelApi.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "Id", "Address", "CreatedAt", "Email", "FirstName", "LastName", "Phone", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "john@example.com", "John", "Doe", "111-222", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "sarah@example.com", "Sarah", "Connor", "333-444", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Rooms",
+                columns: new[] { "Id", "Active", "Amenities", "BaseCapacity", "MaxExtraBeds", "PricePerNight", "RoomNumber", "Type" },
+                values: new object[,]
+                {
+                    { 1, true, null, 2, 0, 80m, "101", 0 },
+                    { 2, true, null, 3, 1, 100m, "102", 0 },
+                    { 3, true, null, 4, 2, 150m, "201", 0 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Bookings",
+                columns: new[] { "Id", "CreatedAt", "CustomerId", "EndDate", "ExtraBedsCount", "InvoiceId", "NumPersons", "RoomId", "StartDate", "Status", "TotalPrice", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2025, 1, 11, 0, 0, 0, 0, DateTimeKind.Utc), 1, new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc), 0, 1, 2, 1, new DateTime(2024, 2, 4, 0, 0, 0, 0, DateTimeKind.Utc), 1, 240m, new DateTime(2025, 1, 11, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, new DateTime(2025, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc), 2, new DateTime(2024, 3, 5, 0, 0, 0, 0, DateTimeKind.Utc), 1, 2, 3, 2, new DateTime(2024, 3, 2, 0, 0, 0, 0, DateTimeKind.Utc), 0, 500m, new DateTime(2025, 2, 6, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Invoices",
+                columns: new[] { "Id", "AmountDue", "BookingId", "IssueDate", "Status" },
+                values: new object[,]
+                {
+                    { 1, 240m, 1, new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1 },
+                    { 2, 500m, 2, new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Payments",
+                columns: new[] { "Id", "AmountPaid", "InvoiceId", "PaymentDate", "PaymentMethod" },
+                values: new object[] { 1, 240m, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Credit Card" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_CustomerId",

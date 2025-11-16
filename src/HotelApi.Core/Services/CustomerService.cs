@@ -25,8 +25,8 @@ public class CustomerService(
     {
         var existing = await _customerRepository.GetByIdAsync(id);
         if (existing == null) return null;
-        existing.Firstname = updatedCustomer.Firstname;
-        existing.Lastname = updatedCustomer.Lastname;
+        existing.FirstName = updatedCustomer.FirstName;
+        existing.LastName = updatedCustomer.LastName;
         existing.Email = updatedCustomer.Email;
         existing.Phone = updatedCustomer.Phone;
 
