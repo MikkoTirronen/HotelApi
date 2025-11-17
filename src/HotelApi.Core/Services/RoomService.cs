@@ -1,15 +1,16 @@
 using HotelApi.src.HotelApi.Core.Interfaces;
 using HotelApi.src.HotelApi.Data.Interfaces;
+using HotelApi.src.HotelApi.Domain.DTOs;
 using HotelApi.src.HotelApi.Domain.Entities;
 
 namespace HotelApi.src.HotelApi.Core.Services;
 
-public class RoomService(IGenericRepository<Room> roomRepository) : IRoomService
+public class RoomService(IRoomRepository roomRepository) : IRoomService
 {
-    private readonly IGenericRepository<Room> _roomRepository = roomRepository;
+    private readonly IRoomRepository _roomRepository = roomRepository;
 
-    public async Task<IEnumerable<Room>> GetAllRoomsAsync() => await _roomRepository.GetAllAsync();
-    public async Task<Room?> GetRoomByIdAsync(int id) => await _roomRepository.GetByIdAsync(id);
+    public async Task<IEnumerable<RoomDto>> GetAllRoomsAsync() => await _roomRepository.GetAllWithBookingsAsync();
+    public async Task<RoomDto?> GetRoomByIdAsync(int id) => await _roomRepository.GetByIdWithBookingsAsync(id);
     public async Task<Room> CreateRoomAsync(Room room)
     {
         await _roomRepository.AddAsync(room);
