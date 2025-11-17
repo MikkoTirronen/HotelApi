@@ -11,28 +11,91 @@ public class RoomService(IRoomRepository roomRepository) : IRoomService
 
     public async Task<IEnumerable<RoomDto>> GetAllRoomsAsync() => await _roomRepository.GetAllWithBookingsAsync();
     public async Task<RoomDto?> GetRoomByIdAsync(int id) => await _roomRepository.GetByIdWithBookingsAsync(id);
-    public async Task<Room> CreateRoomAsync(Room room)
+    public async Task<RoomDto> CreateRoomAsync(CreateRoomDto dto)
     {
+        var room = new Room
+        {
+            RoomNumber = dto.RoomNumber,
+            PricePerNight = dto.PricePerNight,
+            BaseCapacity = dto.BaseCapacity,
+            MaxExtraBeds = dto.MaxExtraBeds,
+            Amenities = dto.Amenities,
+            Active = true
+        };
         await _roomRepository.AddAsync(room);
         await _roomRepository.SaveAsync();
-        return room;
+        return new RoomDto
+        {
+            Id = room.Id,
+            RoomNumber = room.RoomNumber,
+            PricePerNight = room.PricePerNight,
+            BaseCapacity = room.BaseCapacity,
+            MaxExtraBeds = room.MaxExtraBeds,
+            Amenities = room.Amenities,
+            Active = room.Active,
+            Bookings = [] // or new List<BookingDto>()
+        };
     }
-    public async Task<Room?> UpdateRoomAsync(int id, Room updatedRoom)
+    public async Task<RoomDto?> UpdateRoomAsync(int id, UpdateRoomDto dto)
     {
-        var existing = await _roomRepository.GetByIdAsync(id);
-        if (existing == null) return null;
+        var room = await _roomRepository.GetByIdAsync(id);
+        if (room == null)
+            return null;
 
-        existing.RoomNumber = updatedRoom.RoomNumber;
-        existing.Type = updatedRoom.Type;
-        existing.BaseCapacity = updatedRoom.BaseCapacity;
-        existing.MaxExtraBeds = updatedRoom.MaxExtraBeds;
-        existing.PricePerNight = updatedRoom.PricePerNight;
-        existing.Amenities = updatedRoom.Amenities;
-        existing.Active = updatedRoom.Active;
+        // Update only allowed fields
+        if (dto.PricePerNight.HasValue)
+            room.PricePerNight = dto.PricePerNight.Value;
 
-        _roomRepository.Update(existing);
+        if (dto.BaseCapacity.HasValue)
+            room.BaseCapacity = dto.BaseCapacity.Value;
+
+        if (dto.MaxExtraBeds.HasValue)
+            room.MaxExtraBeds = dto.MaxExtraBeds.Value;
+
+        if (!string.IsNullOrWhiteSpace(dto.Amenities))
+            room.Amenities = dto.Amenities;
+
+        if (dto.Active.HasValue)
+            room.Active = dto.Active.Value;
+
+        _roomRepository.Update(room);
         await _roomRepository.SaveAsync();
-        return existing;
+
+        var roomDto = new RoomDto
+        {
+            Id = room.Id,
+            RoomNumber = room.RoomNumber,
+            PricePerNight = room.PricePerNight,
+            BaseCapacity = room.BaseCapacity,
+            MaxExtraBeds = room.MaxExtraBeds,
+            Amenities = room.Amenities,
+            Active = room.Active,
+            Bookings = room.Bookings.Select(b => new BookingDto
+            {
+                Id = b.Id,
+                Customer = new CustomerDto
+                {
+                    Id = b.Customer.Id,
+                    FirstName = b.Customer.FirstName,
+                    LastName = b.Customer.LastName,
+                    Email = b.Customer.Email,
+                    Phone = b.Customer.Phone
+                },
+                Invoice = b.Invoice == null ? new InvoiceDto { } : new InvoiceDto
+                {
+                    Id = b.Invoice.Id,
+                    AmountDue = b.Invoice.AmountDue,
+                    Status = b.Invoice.Status,
+                    IssueDate = b.Invoice.IssueDate
+                },
+                NumPersons = b.NumPersons,
+                StartDate = b.StartDate,
+                EndDate = b.EndDate,
+                Status = (Domain.Enums.InvoiceStatus)b.Status
+            }).ToList()
+        };
+
+        return roomDto;
     }
 
     public async Task<bool> DeleteRoomAsync(int id)
