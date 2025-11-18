@@ -32,8 +32,8 @@ public class RoomService(IRoomRepository roomRepository) : IRoomService
             BaseCapacity = room.BaseCapacity,
             MaxExtraBeds = room.MaxExtraBeds,
             Amenities = room.Amenities,
-            Active = room.Active,
-            Bookings = [] // or new List<BookingDto>()
+            Active = room.Active
+           // Bookings = [] // or new List<BookingDto>()
         };
     }
     public async Task<RoomDto?> UpdateRoomAsync(int id, UpdateRoomDto dto)
@@ -70,29 +70,30 @@ public class RoomService(IRoomRepository roomRepository) : IRoomService
             MaxExtraBeds = room.MaxExtraBeds,
             Amenities = room.Amenities,
             Active = room.Active,
-            Bookings = room.Bookings.Select(b => new BookingDto
-            {
-                Id = b.Id,
-                Customer = new CustomerDto
-                {
-                    Id = b.Customer.Id,
-                    FirstName = b.Customer.FirstName,
-                    LastName = b.Customer.LastName,
-                    Email = b.Customer.Email,
-                    Phone = b.Customer.Phone
-                },
-                Invoice = b.Invoice == null ? new InvoiceDto { } : new InvoiceDto
-                {
-                    Id = b.Invoice.Id,
-                    AmountDue = b.Invoice.AmountDue,
-                    Status = b.Invoice.Status,
-                    IssueDate = b.Invoice.IssueDate
-                },
-                NumPersons = b.NumPersons,
-                StartDate = b.StartDate,
-                EndDate = b.EndDate,
-                Status = (Domain.Enums.InvoiceStatus)b.Status
-            }).ToList()
+            // Bookings = room.Bookings.Select(b => new BookingDto
+            // {
+            //     Id = b.Id,
+            //     Customer = new CustomerDto
+            //     {
+            //         Id = b.Customer.Id,
+            //         FirstName = b.Customer.FirstName,
+            //         LastName = b.Customer.LastName,
+            //         Email = b.Customer.Email,
+            //         Phone = b.Customer.Phone
+            //     },
+            //     Invoice = b.Invoice == null ? new InvoiceDto { } : new InvoiceDto
+            //     {
+            //         Id = b.Invoice.Id,
+            //         AmountDue = b.Invoice.AmountDue,
+            //         Status = b.Invoice.Status,
+            //         IssueDate = b.Invoice.IssueDate
+            //     },
+            //     NumPersons = b.NumPersons,
+            //     StartDate = b.StartDate,
+            //     EndDate = b.EndDate,
+            //     Status = (Domain.Enums.InvoiceStatus)b.Status
+            // }
+            // ).ToList()
         };
 
         return roomDto;
