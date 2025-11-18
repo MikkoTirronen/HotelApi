@@ -16,6 +16,10 @@ public class CustomerRepository : ICustomerRepository
     {
         return await _context.Customers.FirstOrDefaultAsync(c => c.Id == id);
     }
+    public async Task<Customer?> GetByEmailAsync(string email)
+    {
+        return await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+    }
     public async Task AddAsync(Customer customer) => await _context.Customers.AddAsync(customer);
     public void Delete(Customer customer) => _context.Customers.Remove(customer);
     public void Update(Customer customer) => _context.Customers.Update(customer);
