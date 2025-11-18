@@ -1,60 +1,149 @@
 using HotelApi.src.HotelApi.Core.Interfaces;
-using HotelApi.src.HotelApi.Data.Interfaces;
+using HotelApi.src.HotelApi.Data.Contexts;
+using HotelApi.src.HotelApi.Domain.DTOs;
 using HotelApi.src.HotelApi.Domain.Entities;
 using HotelApi.src.HotelApi.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
-namespace HotelApi.src.HotelApi.Core.Services;
-
-public class InvoiceService(IGenericRepository<Invoice> invoiceRepository, IGenericRepository<Booking> bookingRepository) : IInvoiceService
+public class InvoiceService : IInvoiceService
 {
-    private readonly IGenericRepository<Invoice> _invoiceRepository = invoiceRepository;
-    private readonly IGenericRepository<Booking> _bookingRepository = bookingRepository;
+    private readonly HotelDbContext _context;
 
-    public async Task<IEnumerable<Invoice>> GetAllInvoicesAsync() => await _invoiceRepository.GetAllAsync();
-    public async Task<Invoice?> GetInvoiceByIdAsync(int id) => await _invoiceRepository.GetByIdAsync(id);
-
-    public async Task<Invoice?> GetInvoiceByBookingIdAsync(int bookingId)
+    public InvoiceService(HotelDbContext context)
     {
-        var invoices = await _invoiceRepository.GetAllAsync();
-        return invoices.FirstOrDefault(i => i.BookingId == bookingId);
+        _context = context;
     }
 
-    public async Task<Invoice> CreateInvoiceAsync(int bookingId, decimal amount)
+    public async Task<IEnumerable<InvoiceDto>> GetAllInvoicesAsync()
     {
-        var booking = await _bookingRepository.GetByIdAsync(bookingId) ?? throw new Exception("Booking not found.");
+        var invoices = await _context.Invoices
+            .Include(i => i.Booking)
+                .ThenInclude(b => b.Customer)
+            .Include(i => i.Booking)
+                .ThenInclude(b => b.Room)
+            .ToListAsync();
 
+        return invoices.Select(MapToDto).ToList();
+    }
+
+    public async Task<InvoiceDto?> GetInvoiceByIdAsync(int id)
+    {
+        var invoice = await _context.Invoices
+            .Include(i => i.Booking)
+                .ThenInclude(b => b.Customer)
+            .Include(i => i.Booking)
+                .ThenInclude(b => b.Room)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        return invoice == null ? null : MapToDto(invoice);
+    }
+
+    public async Task<InvoiceDto?> GetInvoiceByBookingIdAsync(int bookingId)
+    {
+        var invoice = await _context.Invoices
+            .Include(i => i.Booking)
+                .ThenInclude(b => b.Customer)
+            .Include(i => i.Booking)
+                .ThenInclude(b => b.Room)
+            .FirstOrDefaultAsync(i => i.BookingId == bookingId);
+
+        return invoice == null ? null : MapToDto(invoice);
+    }
+
+    public async Task<InvoiceDto> CreateInvoiceAsync(int bookingId, decimal amount)
+    {
         var invoice = new Invoice
         {
             BookingId = bookingId,
             AmountDue = amount,
             IssueDate = DateTime.UtcNow,
-            Status = InvoiceStatus.Unpaid,
-            Payments = []
+            Status = InvoiceStatus.Unpaid
         };
 
-        await _invoiceRepository.AddAsync(invoice);
-        await _invoiceRepository.SaveAsync();
-        return invoice;
+        await _context.Invoices.AddAsync(invoice);
+        await _context.SaveChangesAsync();
+
+        return MapToDto(invoice);
     }
 
-    public async Task<bool> RegisterPaymentAsync(int invoiceId)
+    public async Task<bool> RegisterPaymentAsync(int invoiceId, decimal amountPaid, string paymentMethod)
     {
-        var invoice = await _invoiceRepository.GetByIdAsync(invoiceId);
+        var invoice = await _context.Invoices
+            .Include(i => i.Booking)
+            .FirstOrDefaultAsync(i => i.Id == invoiceId);
+
         if (invoice == null) return false;
 
-        invoice.Status = InvoiceStatus.Paid;
-        invoice.IssueDate = DateTime.UtcNow;
+        // Create a payment record
+        var payment = new PaymentRecord
+        {
+            InvoiceId = invoice.Id,
+            AmountPaid = amountPaid,
+            PaymentDate = DateTime.UtcNow,
+            PaymentMethod = paymentMethod
+        };
 
-        _invoiceRepository.Update(invoice);
-        await _invoiceRepository.SaveAsync();
+        await _context.Payments.AddAsync(payment);
+
+        // Update invoice status
+        invoice.Status = invoice.AmountDue <= amountPaid ? InvoiceStatus.Paid : InvoiceStatus.Unpaid;
+
+        _context.Invoices.Update(invoice);
+        await _context.SaveChangesAsync();
+
         return true;
     }
-    public async Task<IEnumerable<Invoice>> GetUnpaidInvoicesOlderThanAsync(int days)
+
+    public async Task<IEnumerable<InvoiceDto>> GetUnpaidInvoicesOlderThanAsync(int days)
     {
-        var invoices = await _invoiceRepository.GetAllAsync();
         var cutoff = DateTime.UtcNow.AddDays(-days);
 
-        return [.. invoices.Where(i => i.Status == InvoiceStatus.Unpaid && i.IssueDate < cutoff)];
+        var invoices = await _context.Invoices
+            .Include(i => i.Booking)
+                .ThenInclude(b => b.Customer)
+            .Include(i => i.Booking)
+                .ThenInclude(b => b.Room)
+            .Where(i => i.Status != InvoiceStatus.Paid && i.IssueDate < cutoff)
+            .ToListAsync();
+
+        return invoices.Select(MapToDto).ToList();
     }
 
+    // Helper mapping function
+    private static InvoiceDto MapToDto(Invoice invoice)
+    {
+        return new InvoiceDto
+        {
+            Id = invoice.Id,
+            AmountDue = invoice.AmountDue,
+            IssueDate = invoice.IssueDate,
+            Status = invoice.Status,
+            BookingId = invoice.BookingId
+            // Booking = invoice.Booking == null ? null : new BookingDto
+            // {
+            //     Id = invoice.Booking.Id,
+            //     StartDate = invoice.Booking.StartDate,
+            //     EndDate = invoice.Booking.EndDate,
+            //     NumPersons = invoice.Booking.NumPersons,
+            //     Status = (InvoiceStatus)invoice.Booking.Status,
+            //     Customer = new CustomerDto
+            //     {
+            //         Id = invoice.Booking.Customer.Id,
+            //         FirstName = invoice.Booking.Customer.FirstName,
+            //         LastName = invoice.Booking.Customer.LastName,
+            //         Email = invoice.Booking.Customer.Email,
+            //         Phone = invoice.Booking.Customer.Phone
+            //     },
+            //     Room = new RoomDto
+            //     {
+            //         Id = invoice.Booking.Room.Id,
+            //         RoomNumber = invoice.Booking.Room.RoomNumber,
+            //         PricePerNight = invoice.Booking.Room.PricePerNight,
+            //         BaseCapacity = invoice.Booking.Room.BaseCapacity,
+            //         MaxExtraBeds = invoice.Booking.Room.MaxExtraBeds,
+            //         Amenities = invoice.Booking.Room.Amenities
+            //     }
+            // }
+        };
+    }
 }
