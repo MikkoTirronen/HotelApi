@@ -8,4 +8,12 @@ public interface IBookingRepository
     Task AddAsync(Booking booking);
     void Update(Booking booking);
     Task SaveAsync();
+    Task<List<Booking>> AdvancedSearchAsync(
+    string? customer,
+    string? room,
+    int? bookingId,
+    DateTime? startDate,
+    DateTime? endDate,
+    int? guests);
+
 }

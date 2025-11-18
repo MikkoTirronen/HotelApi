@@ -18,8 +18,27 @@ public static class BookingEndPoints
             var booking = await service.GetBookingByIdAsync(id);
             return booking != null ? Results.Ok(booking) : Results.NotFound();
         });
+        group.MapGet("/search/existing", async (
+                string? customer,
+                string? room,
+                int? bookingId,
+                DateTime? startDate,
+                DateTime? endDate,
+                int? guests,
+                IBookingService service) =>
+        {
+            var results = await service.AdvancedSearchAsync(
+                customer,
+                room,
+                bookingId,
+                startDate,
+                endDate,
+                guests);
 
-        group.MapPost("/", async (CreateBookingDto booking, IBookingService service) =>
+            return Results.Ok(results);
+        });
+
+        group.MapPost("/", async (CreateBookingWithCustomerDto booking, IBookingService service) =>
         {
             try
             {

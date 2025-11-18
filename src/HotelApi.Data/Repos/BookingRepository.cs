@@ -47,4 +47,61 @@ public class BookingRepository : IBookingRepository
         => _context.Bookings.Update(booking);
 
     public async Task SaveAsync() => await _context.SaveChangesAsync();
+
+    public async Task<List<Booking>> AdvancedSearchAsync(
+    string? customer,
+    string? room,
+    int? bookingId,
+    DateTime? startDate,
+    DateTime? endDate,
+    int? guests)
+    {
+        var queryable = _context.Bookings
+    .Include(b => b.Customer)
+    .Include(b => b.Room)
+    .AsQueryable();
+
+        if (bookingId.HasValue)
+        {
+            queryable = queryable.Where(b => b.Id == bookingId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(customer))
+        {
+            var search = $"%{customer.ToLower()}%";
+
+            queryable = queryable.Where(b =>
+                EF.Functions.Like(b.Customer.Name.ToLower(), search) ||
+                EF.Functions.Like(b.Customer.Email.ToLower(), search)
+            );
+        }
+
+        if (!string.IsNullOrWhiteSpace(room))
+        {
+            var search = $"%{room}%";
+            queryable = queryable.Where(b =>
+                EF.Functions.Like(b.Room.RoomNumber, search));
+        }
+
+        if (startDate.HasValue)
+        {
+            var startUtc = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Utc);
+            queryable = queryable.Where(b => b.EndDate >= startUtc);
+        }
+
+        if (endDate.HasValue)
+        {
+            var endUtc = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Utc);
+            queryable = queryable.Where(b => b.StartDate <= endUtc);
+        }
+
+        if (guests.HasValue)
+        {
+            queryable = queryable.Where(b => b.NumPersons == guests.Value);
+        }
+
+
+        return await queryable.ToListAsync();
+    }
+
 }
