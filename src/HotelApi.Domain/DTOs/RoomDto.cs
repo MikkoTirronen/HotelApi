@@ -9,5 +9,5 @@ public class RoomDto
     public int MaxExtraBeds { get; set; }
     public string? Amenities { get; set; }
     public bool Active { get; set; }
-    public List<BookingDto> Bookings { get; set; } = new List<BookingDto>();
+   // public List<BookingDto> Bookings { get; set; } = new List<BookingDto>();
 }
