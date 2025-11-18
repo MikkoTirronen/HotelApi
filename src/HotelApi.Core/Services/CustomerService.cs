@@ -21,8 +21,7 @@ public class CustomerService : ICustomerService
         return customers.Select(c => new CustomerDto
         {
             Id = c.Id,
-            FirstName = c.FirstName,
-            LastName = c.LastName,
+            Name = c.Name,
             Email = c.Email,
             Phone = c.Phone
         });
@@ -36,8 +35,7 @@ public class CustomerService : ICustomerService
         return new CustomerDto
         {
             Id = c.Id,
-            FirstName = c.FirstName,
-            LastName = c.LastName,
+            Name = c.Name,
             Email = c.Email,
             Phone = c.Phone
         };
@@ -47,8 +45,7 @@ public class CustomerService : ICustomerService
     {
         var customer = new Customer
         {
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
+            Name = dto.Name,
             Email = dto.Email,
             Phone = dto.Phone,
             CreatedAt = DateTime.UtcNow,
@@ -61,8 +58,7 @@ public class CustomerService : ICustomerService
         return new CustomerDto
         {
             Id = customer.Id,
-            FirstName = customer.FirstName,
-            LastName = customer.LastName,
+            Name = customer.Name,     
             Email = customer.Email,
             Phone = customer.Phone
         };
@@ -73,11 +69,8 @@ public class CustomerService : ICustomerService
         var customer = await _repo.GetByIdAsync(id);
         if (customer == null) return null;
 
-        if (!string.IsNullOrWhiteSpace(dto.FirstName))
-            customer.FirstName = dto.FirstName;
-
-        if (!string.IsNullOrWhiteSpace(dto.LastName))
-            customer.LastName = dto.LastName;
+        if (!string.IsNullOrWhiteSpace(dto.Name))
+            customer.Name = dto.Name;
 
         if (!string.IsNullOrWhiteSpace(dto.Email))
             customer.Email = dto.Email;
@@ -93,8 +86,7 @@ public class CustomerService : ICustomerService
         return new CustomerDto
         {
             Id = customer.Id,
-            FirstName = customer.FirstName,
-            LastName = customer.LastName,
+            Name = customer.Name,
             Email = customer.Email,
             Phone = customer.Phone
         };
