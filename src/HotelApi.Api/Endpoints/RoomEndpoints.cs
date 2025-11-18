@@ -39,7 +39,7 @@ public static class RoomEndpoints
             return deleted ? Results.NoContent() : Results.NotFound();
         });
 
-        group.MapGet("/rooms/available", async (
+        group.MapGet("/available", async (
             [FromQuery] DateTime start,
             [FromQuery] DateTime end,
             [FromQuery] int guests,
@@ -53,9 +53,9 @@ public static class RoomEndpoints
 
             var availableRooms = await roomService.GetAvailableRoomsAsync(start, end, guests);
             return Results.Ok(availableRooms);
-        })
-        .WithName("GetAvailableRooms")
-        .WithOpenApi(); // Optional: shows nicely in Swagger
+        }).WithName("GetAvailableRooms");
+        // .WithName("GetAvailableRooms")
+        // .WithOpenApi(); // Optional: shows nicely in Swagger
     }
-    
+
 }
