@@ -38,5 +38,24 @@ public static class RoomEndpoints
             var deleted = await service.DeleteRoomAsync(id);
             return deleted ? Results.NoContent() : Results.NotFound();
         });
+
+        group.MapGet("/rooms/available", async (
+            [FromQuery] DateTime start,
+            [FromQuery] DateTime end,
+            [FromQuery] int guests,
+            IRoomService roomService) =>
+        {
+            if (start >= end)
+                return Results.BadRequest("End date must be after start date.");
+
+            if (guests <= 0)
+                return Results.BadRequest("Number of guests must be greater than zero.");
+
+            var availableRooms = await roomService.GetAvailableRoomsAsync(start, end, guests);
+            return Results.Ok(availableRooms);
+        })
+        .WithName("GetAvailableRooms")
+        .WithOpenApi(); // Optional: shows nicely in Swagger
     }
+    
 }

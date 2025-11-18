@@ -5,10 +5,10 @@ using HotelApi.src.HotelApi.Domain.Entities;
 
 namespace HotelApi.src.HotelApi.Core.Services;
 
-public class RoomService(IRoomRepository roomRepository) : IRoomService
+public class RoomService(IRoomRepository roomRepository, IBookingRepository bookingRepository) : IRoomService
 {
     private readonly IRoomRepository _roomRepository = roomRepository;
-
+    private readonly IBookingRepository _bookingRepository = bookingRepository;
     public async Task<IEnumerable<RoomDto>> GetAllRoomsAsync() => await _roomRepository.GetAllWithBookingsAsync();
     public async Task<RoomDto?> GetRoomByIdAsync(int id) => await _roomRepository.GetByIdWithBookingsAsync(id);
     public async Task<RoomDto> CreateRoomAsync(CreateRoomDto dto)
@@ -33,7 +33,7 @@ public class RoomService(IRoomRepository roomRepository) : IRoomService
             MaxExtraBeds = room.MaxExtraBeds,
             Amenities = room.Amenities,
             Active = room.Active
-           // Bookings = [] // or new List<BookingDto>()
+            // Bookings = [] // or new List<BookingDto>()
         };
     }
     public async Task<RoomDto?> UpdateRoomAsync(int id, UpdateRoomDto dto)
@@ -97,6 +97,31 @@ public class RoomService(IRoomRepository roomRepository) : IRoomService
         };
 
         return roomDto;
+    }
+
+    public async Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(DateTime start, DateTime end, int guests)
+    {
+        var allRooms = await _roomRepository.GetAllAsync();
+        var overlappingBookings = await _bookingRepository.GetBookingsInDateRangeAsync(start, end);
+
+        var availableRooms = allRooms
+            .Where(room =>
+                room.Active &&
+                (room.BaseCapacity + room.MaxExtraBeds) >= guests &&
+                !overlappingBookings.Any(b => b.RoomId == room.Id))
+            .Select(r => new RoomDto
+            {
+                Id = r.Id,
+                RoomNumber = r.RoomNumber,
+                PricePerNight = r.PricePerNight,
+                BaseCapacity = r.BaseCapacity,
+                MaxExtraBeds = r.MaxExtraBeds,
+                Amenities = r.Amenities,
+                Active = r.Active
+            })
+            .ToList();
+
+        return availableRooms;
     }
 
     public async Task<bool> DeleteRoomAsync(int id)

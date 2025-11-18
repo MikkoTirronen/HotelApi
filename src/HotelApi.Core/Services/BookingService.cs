@@ -35,7 +35,7 @@ public class BookingService : IBookingService
         return booking == null ? null : MapToDto(booking);
     }
 
-    public async Task<IEnumerable<Room>> GetAvailableRoomsAsync(DateTime start, DateTime end, int guests)
+    public async Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(DateTime start, DateTime end, int guests)
     {
         var allRooms = await _roomRepository.GetAllAsync();
         var overlappingBookings = await _bookingRepository.GetBookingsInDateRangeAsync(start, end);
@@ -47,7 +47,16 @@ public class BookingService : IBookingService
                 !overlappingBookings.Any(b => b.RoomId == room.Id))
             .ToList();
 
-        return availableRooms;
+        return availableRooms.Select(r => new RoomDto
+        {
+            Id = r.Id,
+            RoomNumber = r.RoomNumber,
+            PricePerNight = r.PricePerNight,
+            BaseCapacity = r.BaseCapacity,
+            MaxExtraBeds = r.MaxExtraBeds,
+            Amenities = r.Amenities,
+            Active = r.Active
+        });
     }
 
     public async Task<BookingDto> CreateBookingAsync(CreateBookingDto dto)
@@ -89,37 +98,37 @@ public class BookingService : IBookingService
 
 
     public async Task<BookingDto?> UpdateBookingAsync(int id, UpdateBookingDto dto)
-{
-    var booking = await _bookingRepository.GetByIdWithIncludesAsync(id);
-    if (booking == null) return null;
+    {
+        var booking = await _bookingRepository.GetByIdWithIncludesAsync(id);
+        if (booking == null) return null;
 
-    if (dto.RoomId.HasValue)
-        booking.RoomId = dto.RoomId.Value;
+        if (dto.RoomId.HasValue)
+            booking.RoomId = dto.RoomId.Value;
 
-    if (dto.StartDate.HasValue)
-        booking.StartDate = dto.StartDate.Value;
+        if (dto.StartDate.HasValue)
+            booking.StartDate = dto.StartDate.Value;
 
-    if (dto.EndDate.HasValue)
-        booking.EndDate = dto.EndDate.Value;
+        if (dto.EndDate.HasValue)
+            booking.EndDate = dto.EndDate.Value;
 
-    if (dto.NumPersons.HasValue)
-        booking.NumPersons = dto.NumPersons.Value;
+        if (dto.NumPersons.HasValue)
+            booking.NumPersons = dto.NumPersons.Value;
 
-    // Validate availability on update
-    var available = await GetAvailableRoomsAsync(booking.StartDate, booking.EndDate, booking.NumPersons);
-    if (!available.Any(r => r.Id == booking.RoomId))
-        throw new Exception("Room not available for updated dates");
+        // Validate availability on update
+        var available = await GetAvailableRoomsAsync(booking.StartDate, booking.EndDate, booking.NumPersons);
+        if (!available.Any(r => r.Id == booking.RoomId))
+            throw new Exception("Room not available for updated dates");
 
-    // Recalculate total
-    var room = await _roomRepository.GetByIdAsync(booking.RoomId);
-    if (room != null)
-        booking.TotalPrice = room.PricePerNight * (booking.EndDate - booking.StartDate).Days;
+        // Recalculate total
+        var room = await _roomRepository.GetByIdAsync(booking.RoomId);
+        if (room != null)
+            booking.TotalPrice = room.PricePerNight * (booking.EndDate - booking.StartDate).Days;
 
-     _bookingRepository.Update(booking);
-    await _bookingRepository.SaveAsync();
+        _bookingRepository.Update(booking);
+        await _bookingRepository.SaveAsync();
 
-    return MapToDto(booking);
-}
+        return MapToDto(booking);
+    }
 
 
     public async Task<bool> CancelBookingAsync(int id)

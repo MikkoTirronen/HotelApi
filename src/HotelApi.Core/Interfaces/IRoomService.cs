@@ -10,4 +10,6 @@ public interface IRoomService
     Task<RoomDto> CreateRoomAsync(CreateRoomDto room);
     Task<RoomDto?> UpdateRoomAsync(int id, UpdateRoomDto updatedRoom);
     Task<bool> DeleteRoomAsync(int id);
+    Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(DateTime start, DateTime end, int guests);
+
 }
