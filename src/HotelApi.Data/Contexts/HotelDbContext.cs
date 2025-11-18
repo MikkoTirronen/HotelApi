@@ -37,15 +37,19 @@ public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContex
 
         // ----- Rooms -----
         modelBuilder.Entity<Room>().HasData(
-            new Room { Id = 1, RoomNumber = "101", BaseCapacity = 2, PricePerNight = 80, MaxExtraBeds = 0 },
-            new Room { Id = 2, RoomNumber = "102", BaseCapacity = 3, PricePerNight = 100, MaxExtraBeds = 1 },
-            new Room { Id = 3, RoomNumber = "201", BaseCapacity = 4, PricePerNight = 150, MaxExtraBeds = 2 }
+            new Room { Id = 1, RoomNumber = "101", BaseCapacity = 1, PricePerNight = 80, MaxExtraBeds = 0 },
+            new Room { Id = 2, RoomNumber = "102", BaseCapacity = 1, PricePerNight = 100, MaxExtraBeds = 1 },
+            new Room { Id = 3, RoomNumber = "103", BaseCapacity = 1, PricePerNight = 100, MaxExtraBeds = 1 },
+            new Room { Id = 4, RoomNumber = "201", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 0 },
+            new Room { Id = 5, RoomNumber = "202", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 1 },
+            new Room { Id = 6, RoomNumber = "203", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 2 }
+
         );
 
         // ----- Customers -----
         modelBuilder.Entity<Customer>().HasData(
-            new Customer { Id = 1, FirstName = "John", LastName = "Doe", Email = "john@example.com", Phone = "111-222" },
-            new Customer { Id = 2, FirstName = "Sarah", LastName = "Connor", Email = "sarah@example.com", Phone = "333-444" }
+            new Customer { Id = 1, Name = "John Doe", Email = "john@example.com", Phone = "111-222" },
+            new Customer { Id = 2, Name = "Sarah Connor", Email = "sarah@example.com", Phone = "333-444" }
         );
 
         // ----- Bookings (must reference valid Room + Customer) -----
