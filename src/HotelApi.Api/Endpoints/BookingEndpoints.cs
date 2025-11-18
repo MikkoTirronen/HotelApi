@@ -1,4 +1,5 @@
 using HotelApi.src.HotelApi.Core.Interfaces;
+using HotelApi.src.HotelApi.Domain.DTOs;
 using HotelApi.src.HotelApi.Domain.Entities;
 
 namespace HotelApi.src.HotelApi.Api.Endpoints;
@@ -18,7 +19,7 @@ public static class BookingEndPoints
             return booking != null ? Results.Ok(booking) : Results.NotFound();
         });
 
-        group.MapPost("", async (Booking booking, IBookingService service) =>
+        group.MapPost("/", async (CreateBookingDto booking, IBookingService service) =>
         {
             try
             {
@@ -31,7 +32,7 @@ public static class BookingEndPoints
             }
         });
 
-        group.MapPut("/{id:int}", async (int id, Booking booking, IBookingService service) =>
+        group.MapPut("/{id:int}", async (int id, UpdateBookingDto booking, IBookingService service) =>
         {
             try
             {
