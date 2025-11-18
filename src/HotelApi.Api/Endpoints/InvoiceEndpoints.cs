@@ -9,7 +9,7 @@ public static class InvoiceEndpoints
     {
         app.MapGet("/invoices", async (IInvoiceService service) =>
         {
-            Results.Ok(await service.GetAllInvoicesAsync());
+            return Results.Ok(await service.GetAllInvoicesAsync());
         });
 
         app.MapGet("/invoices/{id:int}", async (int id, IInvoiceService service) =>
@@ -23,6 +23,5 @@ public static class InvoiceEndpoints
             var invoice = await service.GetInvoiceByBookingIdAsync(bookingId);
             return invoice != null ? Results.Ok(invoice) : Results.NotFound();
         });
-
     }
 }
