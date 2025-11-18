@@ -38,11 +38,13 @@ public class BookingRepository : IBookingRepository
     public async Task<List<Booking>> GetBookingsInDateRangeAsync(DateTime start, DateTime end) =>
     await _context.Bookings
         .Where(b => b.StartDate < end && b.EndDate > start && b.Status != BookingStatus.Canceled)
-        .Include(b => b.Room)      
-        .Include(b => b.Customer)  
+        .Include(b => b.Room)
+        .Include(b => b.Customer)
         .ToListAsync();
 
     public async Task AddAsync(Booking booking) => await _context.Bookings.AddAsync(booking);
-    public async Task UpdateAsync(Booking booking) => _context.Bookings.Update(booking);
+    public void Update(Booking booking)
+        => _context.Bookings.Update(booking);
+
     public async Task SaveAsync() => await _context.SaveChangesAsync();
 }

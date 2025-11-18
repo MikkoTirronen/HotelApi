@@ -6,6 +6,6 @@ public interface IBookingRepository
     Task<Booking?> GetByIdWithIncludesAsync(int id, bool includeRoom = true, bool includeCustomer = true, bool includeInvoice = true);
     Task<List<Booking>> GetBookingsInDateRangeAsync(DateTime start, DateTime end);
     Task AddAsync(Booking booking);
-    Task UpdateAsync(Booking booking);
+    void Update(Booking booking);
     Task SaveAsync();
 }

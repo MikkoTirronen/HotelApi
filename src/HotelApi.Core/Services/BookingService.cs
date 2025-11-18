@@ -93,7 +93,7 @@ public class BookingService : IBookingService
         if (room != null)
             existing.TotalPrice = room.PricePerNight * (updatedBooking.EndDate - updatedBooking.StartDate).Days;
 
-        await _bookingRepository.UpdateAsync(existing);
+        _bookingRepository.Update(existing);
         await _bookingRepository.SaveAsync();
 
         return MapToDto(existing);
@@ -105,7 +105,7 @@ public class BookingService : IBookingService
         if (booking == null) return false;
 
         booking.Status = BookingStatus.Canceled;
-        await _bookingRepository.UpdateAsync(booking);
+         _bookingRepository.Update(booking);
         await _bookingRepository.SaveAsync();
         return true;
     }
