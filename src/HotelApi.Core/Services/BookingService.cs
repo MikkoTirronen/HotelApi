@@ -8,13 +8,13 @@ public class BookingService : IBookingService
 {
     private readonly IBookingRepository _bookingRepository;
     private readonly IGenericRepository<Room> _roomRepository;
-    private readonly IGenericRepository<Customer> _customerRepository;
+    private readonly ICustomerRepository _customerRepository;
     private readonly IInvoiceService _invoiceService;
 
     public BookingService(
         IBookingRepository bookingRepository,
         IGenericRepository<Room> roomRepository,
-        IGenericRepository<Customer> customerRepository,
+        ICustomerRepository customerRepository,
         IInvoiceService invoiceService)
     {
         _bookingRepository = bookingRepository;
@@ -59,25 +59,44 @@ public class BookingService : IBookingService
         });
     }
 
-    public async Task<BookingDto> CreateBookingAsync(CreateBookingDto dto)
+    public async Task<BookingDto> CreateBookingAsync(CreateBookingWithCustomerDto dto)
     {
-        var customer = await _customerRepository.GetByIdAsync(dto.CustomerId)
-            ?? throw new Exception("Invalid Customer ID");
+        // 1. Find or create customer
+        var customer = await _customerRepository.GetByEmailAsync(dto.Email);
 
+        if (customer == null)
+        {
+            customer = new Customer
+            {
+                Name = dto.Name,
+                Email = dto.Email,
+                Phone = dto.Phone,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _customerRepository.AddAsync(customer);
+            await _customerRepository.SaveAsync(); // 🔥 customer.Id is generated here
+        }
+
+
+        // 2. Validate room
         var room = await _roomRepository.GetByIdAsync(dto.RoomId)
             ?? throw new Exception("Invalid Room ID");
 
-        // Check availability
+        // 3. Check availability
         var available = await GetAvailableRoomsAsync(dto.StartDate, dto.EndDate, dto.NumPersons);
         if (!available.Any(r => r.Id == dto.RoomId))
             throw new Exception("Room not available for selected dates");
 
+        // Calculate total price
         int nights = (dto.EndDate - dto.StartDate).Days;
         decimal total = room.PricePerNight * nights;
 
+        // 4. Create booking
         var booking = new Booking
         {
-            CustomerId = dto.CustomerId,
+            CustomerId = customer.Id,  // 🔥 USE THE GENERATED ID
             RoomId = dto.RoomId,
             StartDate = dto.StartDate,
             EndDate = dto.EndDate,
@@ -89,10 +108,27 @@ public class BookingService : IBookingService
         await _bookingRepository.AddAsync(booking);
         await _bookingRepository.SaveAsync();
 
+        // 5. Create invoice
         await _invoiceService.CreateInvoiceAsync(booking.Id, total);
 
+        // 6. Fetch booking with full navigation properties
         var fullBooking = await _bookingRepository.GetByIdWithIncludesAsync(booking.Id);
+
         return MapToDto(fullBooking!);
+    }
+
+    public async Task<IEnumerable<BookingDto>> AdvancedSearchAsync(
+        string? customer,
+        string? room,
+        int? bookingId,
+        DateTime? startDate,
+        DateTime? endDate,
+        int? guests)
+    {
+        var results = await _bookingRepository.AdvancedSearchAsync(
+            customer, room, bookingId, startDate, endDate, guests);
+
+        return results.Select(MapToDto);
     }
 
 
@@ -151,8 +187,7 @@ public class BookingService : IBookingService
         Customer = b.Customer == null ? new CustomerDto { } : new CustomerDto
         {
             Id = b.Customer.Id,
-            FirstName = b.Customer.FirstName,
-            LastName = b.Customer.LastName,
+            Name = b.Customer.Name,
             Email = b.Customer.Email,
             Phone = b.Customer.Phone
         },
