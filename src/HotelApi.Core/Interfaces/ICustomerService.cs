@@ -1,12 +1,13 @@
+using HotelApi.src.HotelApi.Domain.DTOs;
 using HotelApi.src.HotelApi.Domain.Entities;
 
 namespace HotelApi.src.HotelApi.Core.Interfaces;
 
 public interface ICustomerService
 {
-    Task<IEnumerable<Customer>> GetAllCustomersAsync();
-    Task<Customer?> GetCustomerByIdAsync(int id);
-    Task<Customer> CreateCustomerAsync(Customer customer);
-    Task<Customer?> UpdateCustomerAsync(int id, Customer updatedCustomer);
-    Task<bool> DeleteCustomerAsync(int id);
+    Task<IEnumerable<CustomerDto>> GetAllAsync();
+    Task<CustomerDto?> GetByIdAsync(int id);
+    Task<CustomerDto> CreateAsync(CreateCustomerDto dto);
+    Task<CustomerDto?> UpdateAsync(int id, UpdateCustomerDto dto);
+    Task<bool> DeleteAsync(int id);
 }
