@@ -15,5 +15,5 @@ public interface IBookingRepository
     DateTime? startDate,
     DateTime? endDate,
     int? guests);
-
-}
+    Task<bool> DeleteBookingAsync(int id);
+}   

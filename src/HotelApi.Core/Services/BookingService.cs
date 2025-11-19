@@ -185,7 +185,16 @@ public class BookingService : IBookingService
         await _bookingRepository.SaveAsync();
         return true;
     }
+    public async Task<bool> DeleteBookingAsync(int id)
+    {
+        // Fetch the booking from the database
+        var booking = await _bookingRepository.GetByIdWithIncludesAsync(id);
+        if (booking == null) return false; // Nothing to delete
 
+        // Remove the booking from the DbContext
+        await _bookingRepository.DeleteBookingAsync(id);
+        return true;
+    }
     public async Task<bool> IsRoomAvailableForUpdateAsync(int roomId, DateTime start, DateTime end, int bookingId)
     {
         var overlapping = await _bookingRepository.GetBookingsInDateRangeAsync(start, end);

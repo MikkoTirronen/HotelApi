@@ -103,5 +103,14 @@ public class BookingRepository : IBookingRepository
 
         return await queryable.ToListAsync();
     }
+    public async Task<bool> DeleteBookingAsync(int id)
+    {
+        var booking = await GetByIdWithIncludesAsync(id);
+        if (booking == null) return false;
 
+        _context.Bookings.Remove(booking);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
 }

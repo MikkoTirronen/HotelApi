@@ -8,7 +8,7 @@ public static class BookingEndPoints
 {
     public static void MapBookingEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("bookings").WithTags("Bookings");
+        var group = app.MapGroup("/bookings").WithTags("Bookings");
 
         group.MapGet("/", async (IBookingService service) =>
             Results.Ok(await service.GetAllBookingsAsync()));
@@ -66,7 +66,7 @@ public static class BookingEndPoints
 
         group.MapDelete("/{id:int}", async (int id, IBookingService service) =>
         {
-            var canceled = await service.CancelBookingAsync(id);
+            var canceled = await service.DeleteBookingAsync(id);
             return canceled ? Results.NoContent() : Results.NotFound();
         });
 
