@@ -18,6 +18,6 @@ public class Booking
     public int ExtraBedsCount { get; set; } = 0;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public int InvoiceId { get; set; }
+    public int? InvoiceId { get; set; }
     public Invoice? Invoice { get; set; }
 }
