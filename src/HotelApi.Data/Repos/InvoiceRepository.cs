@@ -31,6 +31,6 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
             .ThenInclude(b => b.Customer)
             .Include(i => i.Booking)
             .ThenInclude(b => b.Room)
-            .FirstOrDefaultAsync(i => i.Id == id);
+            .FirstOrDefaultAsync(i => i.InvoiceId == id);
     }
 }

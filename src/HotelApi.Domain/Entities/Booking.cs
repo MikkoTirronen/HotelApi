@@ -5,7 +5,7 @@ namespace HotelApi.src.HotelApi.Domain.Entities;
 
 public class Booking
 {
-    public int Id { get; set; }
+    public int BookingId { get; set; }
     public int RoomId { get; set; }
     public Room Room { get; set; } = null!;
     public int CustomerId { get; set; }
@@ -16,8 +16,8 @@ public class Booking
     public BookingStatus Status { get; set; } = BookingStatus.Pending;
     [Column(TypeName = "decimal(10,2)")] public decimal TotalPrice { get; set; }
     public int ExtraBedsCount { get; set; } = 0;
-    public DateTime CreatedAt { get; set; } 
-    public DateTime UpdatedAt { get; set; } 
-    public int InvoiceId { get; set; } 
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public int InvoiceId { get; set; }
     public Invoice? Invoice { get; set; }
 }

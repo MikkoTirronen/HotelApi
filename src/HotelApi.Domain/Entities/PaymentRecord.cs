@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,7 +6,7 @@ namespace HotelApi.src.HotelApi.Domain.Entities;
 
 public class PaymentRecord
 {
-    public int Id { get; set; }
+    [Key] public int PaymentId { get; set; }
     public int InvoiceId { get; set; }
     public Invoice Invoice { get; set; } = null!;
 

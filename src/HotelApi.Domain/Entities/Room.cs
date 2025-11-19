@@ -7,12 +7,12 @@ namespace HotelApi.src.HotelApi.Domain.Entities;
 
 public class Room
 {
-    public int Id { get; set; }
+    public int RoomId { get; set; }
     [Required] public string RoomNumber { get; set; } = null!;
     public RoomType Type { get; set; }
     public int BaseCapacity { get; set; }
     public int MaxExtraBeds { get; set; }
-    [Column(TypeName = "decimal(10,2)")] public decimal PricePerNight { get; set;}
+    [Column(TypeName = "decimal(10,2)")] public decimal PricePerNight { get; set; }
     public string? Amenities { get; set; }
     public bool Active { get; set; } = true;
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();

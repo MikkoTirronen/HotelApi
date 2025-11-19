@@ -37,26 +37,26 @@ public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContex
 
         // ----- Rooms -----
         modelBuilder.Entity<Room>().HasData(
-            new Room { Id = 1, RoomNumber = "101", BaseCapacity = 1, PricePerNight = 80, MaxExtraBeds = 0 },
-            new Room { Id = 2, RoomNumber = "102", BaseCapacity = 1, PricePerNight = 100, MaxExtraBeds = 1 },
-            new Room { Id = 3, RoomNumber = "103", BaseCapacity = 1, PricePerNight = 100, MaxExtraBeds = 1 },
-            new Room { Id = 4, RoomNumber = "201", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 0 },
-            new Room { Id = 5, RoomNumber = "202", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 1 },
-            new Room { Id = 6, RoomNumber = "203", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 2 }
+            new Room { RoomId = 1, RoomNumber = "101", BaseCapacity = 1, PricePerNight = 80, MaxExtraBeds = 0 },
+            new Room { RoomId = 2, RoomNumber = "102", BaseCapacity = 1, PricePerNight = 100, MaxExtraBeds = 1 },
+            new Room { RoomId = 3, RoomNumber = "103", BaseCapacity = 1, PricePerNight = 100, MaxExtraBeds = 1 },
+            new Room { RoomId = 4, RoomNumber = "201", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 0 },
+            new Room { RoomId = 5, RoomNumber = "202", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 1 },
+            new Room { RoomId = 6, RoomNumber = "203", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 2 }
 
         );
 
         // ----- Customers -----
         modelBuilder.Entity<Customer>().HasData(
-            new Customer { Id = 1, Name = "John Doe", Email = "john@example.com", Phone = "111-222" },
-            new Customer { Id = 2, Name = "Sarah Connor", Email = "sarah@example.com", Phone = "333-444" }
+            new Customer { CustomerId = 1, Name = "John Doe", Email = "john@example.com", Phone = "111-222" },
+            new Customer { CustomerId = 2, Name = "Sarah Connor", Email = "sarah@example.com", Phone = "333-444" }
         );
 
         // ----- Bookings (must reference valid Room + Customer) -----
         modelBuilder.Entity<Booking>().HasData(
             new Booking
             {
-                Id = 1,
+                BookingId = 1,
                 RoomId = 1,
                 CustomerId = 1,
                 StartDate = new DateTime(2024, 2, 4, 0, 0, 0, DateTimeKind.Utc),
@@ -71,7 +71,7 @@ public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContex
             },
             new Booking
             {
-                Id = 2,
+                BookingId = 2,
                 RoomId = 2,
                 CustomerId = 2,
                 StartDate = new DateTime(2024, 3, 2, 0, 0, 0, DateTimeKind.Utc),
@@ -90,7 +90,7 @@ public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContex
         modelBuilder.Entity<Invoice>().HasData(
             new Invoice
             {
-                Id = 1,
+                InvoiceId = 1,
                 BookingId = 1,
                 AmountDue = 240,
                 IssueDate = new DateTime(2024, 2, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -98,7 +98,7 @@ public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContex
             },
             new Invoice
             {
-                Id = 2,
+                InvoiceId = 2,
                 BookingId = 2,
                 AmountDue = 500,
                 IssueDate = new DateTime(2024, 3, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -110,7 +110,7 @@ public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContex
         modelBuilder.Entity<PaymentRecord>().HasData(
             new PaymentRecord
             {
-                Id = 1,
+                PaymentId = 1,
                 InvoiceId = 1,
                 AmountPaid = 240m,
                 PaymentDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),

@@ -6,7 +6,7 @@ namespace HotelApi.src.HotelApi.Domain.Entities;
 
 public class Invoice
 {
-    public int Id { get; set; }
+    public int InvoiceId { get; set; }
 
     [Required]
     public int BookingId { get; set; }

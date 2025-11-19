@@ -20,7 +20,7 @@ public class CustomerService : ICustomerService
         var customers = await _repo.GetAllAsync();
         return customers.Select(c => new CustomerDto
         {
-            Id = c.Id,
+            CustomerId = c.CustomerId,
             Name = c.Name,
             Email = c.Email,
             Phone = c.Phone
@@ -34,7 +34,7 @@ public class CustomerService : ICustomerService
 
         return new CustomerDto
         {
-            Id = c.Id,
+            CustomerId = c.CustomerId,
             Name = c.Name,
             Email = c.Email,
             Phone = c.Phone
@@ -57,8 +57,8 @@ public class CustomerService : ICustomerService
 
         return new CustomerDto
         {
-            Id = customer.Id,
-            Name = customer.Name,     
+            CustomerId = customer.CustomerId,
+            Name = customer.Name,
             Email = customer.Email,
             Phone = customer.Phone
         };
@@ -85,7 +85,7 @@ public class CustomerService : ICustomerService
 
         return new CustomerDto
         {
-            Id = customer.Id,
+            CustomerId = customer.CustomerId,
             Name = customer.Name,
             Email = customer.Email,
             Phone = customer.Phone

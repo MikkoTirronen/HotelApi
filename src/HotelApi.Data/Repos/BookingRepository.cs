@@ -32,7 +32,7 @@ public class BookingRepository : IBookingRepository
         if (includeCustomer) query = query.Include(b => b.Customer);
         if (includeInvoice) query = query.Include(b => b.Invoice);
 
-        return await query.FirstOrDefaultAsync(b => b.Id == id);
+        return await query.FirstOrDefaultAsync(b => b.BookingId == id);
     }
 
     public async Task<List<Booking>> GetBookingsInDateRangeAsync(DateTime start, DateTime end) =>
@@ -63,7 +63,7 @@ public class BookingRepository : IBookingRepository
 
         if (bookingId.HasValue)
         {
-            queryable = queryable.Where(b => b.Id == bookingId.Value);
+            queryable = queryable.Where(b => b.BookingId == bookingId.Value);
         }
 
         if (!string.IsNullOrWhiteSpace(customer))

@@ -21,7 +21,7 @@ public static class CustomerEndpoints
         group.MapPost("/", async (CreateCustomerDto dto, ICustomerService service) =>
         {
             var created = await service.CreateAsync(dto);
-            return Results.Created($"/{created.Id}", created);
+            return Results.Created($"/{created.CustomerId}", created);
         });
 
         group.MapPut("/{id:int}", async (int id, UpdateCustomerDto dto, ICustomerService service) =>

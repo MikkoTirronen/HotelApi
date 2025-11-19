@@ -43,7 +43,7 @@ public static class BookingEndPoints
             try
             {
                 var created = await service.CreateBookingAsync(booking);
-                return Results.Created($"/{created?.Id}", created);
+                return Results.Created($"/{created?.BookingId}", created);
             }
             catch (Exception ex)
             {

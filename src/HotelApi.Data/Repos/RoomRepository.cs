@@ -25,7 +25,7 @@ public class RoomRepository : GenericRepository<Room>, IRoomRepository
 
         return rooms.Select(r => new RoomDto
         {
-            Id = r.Id,
+            RoomId = r.RoomId,
             RoomNumber = r.RoomNumber,
             PricePerNight = r.PricePerNight,
             BaseCapacity = r.BaseCapacity,
@@ -69,14 +69,14 @@ public class RoomRepository : GenericRepository<Room>, IRoomRepository
                 .ThenInclude(b => b.Customer)
             .Include(r => r.Bookings)
                 .ThenInclude(b => b.Invoice)
-            .FirstOrDefaultAsync(r => r.Id == id);
+            .FirstOrDefaultAsync(r => r.RoomId == id);
 
         if (room == null)
             return null;
 
         return new RoomDto
         {
-            Id = room.Id,
+            RoomId = room.RoomId,
             RoomNumber = room.RoomNumber,
             PricePerNight = room.PricePerNight,
             BaseCapacity = room.BaseCapacity,

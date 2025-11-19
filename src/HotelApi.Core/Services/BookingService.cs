@@ -44,12 +44,12 @@ public class BookingService : IBookingService
             .Where(room =>
                 room.Active &&
                 (room.BaseCapacity + room.MaxExtraBeds) >= guests &&
-                !overlappingBookings.Any(b => b.RoomId == room.Id))
+                !overlappingBookings.Any(b => b.Room.RoomId == room.RoomId))
             .ToList();
 
         return availableRooms.Select(r => new RoomDto
         {
-            Id = r.Id,
+            RoomId = r.RoomId,
             RoomNumber = r.RoomNumber,
             PricePerNight = r.PricePerNight,
             BaseCapacity = r.BaseCapacity,
@@ -86,7 +86,7 @@ public class BookingService : IBookingService
 
         // 3. Check availability
         var available = await GetAvailableRoomsAsync(dto.StartDate, dto.EndDate, dto.NumPersons);
-        if (!available.Any(r => r.Id == dto.RoomId))
+        if (!available.Any(r => r.RoomId == dto.RoomId))
             throw new Exception("Room not available for selected dates");
 
         // Calculate total price
@@ -96,12 +96,11 @@ public class BookingService : IBookingService
         // 4. Create booking
         var booking = new Booking
         {
-            CustomerId = customer.Id,  // 🔥 USE THE GENERATED ID
+            CustomerId = customer.CustomerId,  // 🔥 USE THE GENERATED ID
             RoomId = dto.RoomId,
             StartDate = dto.StartDate,
             EndDate = dto.EndDate,
             NumPersons = dto.NumPersons,
-            TotalPrice = total,
             Status = BookingStatus.Pending
         };
 
@@ -109,10 +108,10 @@ public class BookingService : IBookingService
         await _bookingRepository.SaveAsync();
 
         // 5. Create invoice
-        await _invoiceService.CreateInvoiceAsync(booking.Id, total);
+        await _invoiceService.CreateInvoiceAsync(booking.BookingId, total);
 
         // 6. Fetch booking with full navigation properties
-        var fullBooking = await _bookingRepository.GetByIdWithIncludesAsync(booking.Id);
+        var fullBooking = await _bookingRepository.GetByIdWithIncludesAsync(booking.BookingId);
 
         return MapToDto(fullBooking!);
     }
@@ -152,7 +151,7 @@ public class BookingService : IBookingService
 
         // Validate availability on update
         var available = await GetAvailableRoomsAsync(booking.StartDate, booking.EndDate, booking.NumPersons);
-        if (!available.Any(r => r.Id == booking.RoomId))
+        if (!available.Any(r => r.RoomId == booking.RoomId))
             throw new Exception("Room not available for updated dates");
 
         // Recalculate total
@@ -183,17 +182,17 @@ public class BookingService : IBookingService
     // Map Booking -> BookingDto
     private BookingDto MapToDto(Booking b) => new BookingDto
     {
-        Id = b.Id,
+        BookingId = b.BookingId,
         Customer = b.Customer == null ? new CustomerDto { } : new CustomerDto
         {
-            Id = b.Customer.Id,
+            CustomerId = b.Customer.CustomerId,
             Name = b.Customer.Name,
             Email = b.Customer.Email,
             Phone = b.Customer.Phone
         },
         Room = b.Room == null ? new RoomDto { } : new RoomDto
         {
-            Id = b.Room.Id,
+            RoomId = b.Room.RoomId,
             RoomNumber = b.Room.RoomNumber,
             PricePerNight = b.Room.PricePerNight,
             BaseCapacity = b.Room.BaseCapacity,
@@ -203,7 +202,7 @@ public class BookingService : IBookingService
         },
         Invoice = b.Invoice == null ? new InvoiceDto { } : new InvoiceDto
         {
-            Id = b.Invoice.Id,
+            InvoiceId = b.Invoice.InvoiceId,
             AmountDue = b.Invoice.AmountDue,
             Status = b.Invoice.Status,
             IssueDate = b.Invoice.IssueDate

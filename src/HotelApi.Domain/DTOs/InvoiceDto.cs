@@ -4,7 +4,7 @@ namespace HotelApi.src.HotelApi.Domain.DTOs;
 
 public class InvoiceDto
 {
-    public int Id { get; set; }
+    public int InvoiceId { get; set; }
     public int BookingId { get; set; }
     public decimal AmountDue { get; set; }
     public DateTime IssueDate { get; set; }

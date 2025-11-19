@@ -5,7 +5,7 @@ using HotelApi.src.HotelApi.Domain.Enums;
 
 namespace HotelApi.src.HotelApi.Core.Services
 {
-    public class PaymentService(IGenericRepository<PaymentRecord> paymentRepo, IGenericRepository<Invoice> invoiceRepo):IPaymentService
+    public class PaymentService(IGenericRepository<PaymentRecord> paymentRepo, IGenericRepository<Invoice> invoiceRepo) : IPaymentService
     {
         private readonly IGenericRepository<PaymentRecord> _paymentRepo = paymentRepo;
         private readonly IGenericRepository<Invoice> _invoiceRepo = invoiceRepo;
@@ -20,7 +20,7 @@ namespace HotelApi.src.HotelApi.Core.Services
 
             var payment = new PaymentRecord
             {
-                InvoiceId = invoice.Id,
+                InvoiceId = invoice.InvoiceId,
                 AmountPaid = amount,
                 PaymentDate = DateTime.UtcNow,
                 PaymentMethod = method

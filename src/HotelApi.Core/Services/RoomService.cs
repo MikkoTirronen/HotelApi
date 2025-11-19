@@ -26,7 +26,7 @@ public class RoomService(IRoomRepository roomRepository, IBookingRepository book
         await _roomRepository.SaveAsync();
         return new RoomDto
         {
-            Id = room.Id,
+            RoomId = room.RoomId,
             RoomNumber = room.RoomNumber,
             PricePerNight = room.PricePerNight,
             BaseCapacity = room.BaseCapacity,
@@ -63,7 +63,7 @@ public class RoomService(IRoomRepository roomRepository, IBookingRepository book
 
         var roomDto = new RoomDto
         {
-            Id = room.Id,
+            RoomId = room.RoomId,
             RoomNumber = room.RoomNumber,
             PricePerNight = room.PricePerNight,
             BaseCapacity = room.BaseCapacity,
@@ -108,10 +108,10 @@ public class RoomService(IRoomRepository roomRepository, IBookingRepository book
             .Where(room =>
                 room.Active &&
                 (room.BaseCapacity + room.MaxExtraBeds) >= guests &&
-                !overlappingBookings.Any(b => b.RoomId == room.Id))
+                !overlappingBookings.Any(b => b.Room.RoomId == room.RoomId))
             .Select(r => new RoomDto
             {
-                Id = r.Id,
+                RoomId = r.RoomId,
                 RoomNumber = r.RoomNumber,
                 PricePerNight = r.PricePerNight,
                 BaseCapacity = r.BaseCapacity,

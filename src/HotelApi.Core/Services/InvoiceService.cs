@@ -33,7 +33,7 @@ public class InvoiceService : IInvoiceService
                 .ThenInclude(b => b.Customer)
             .Include(i => i.Booking)
                 .ThenInclude(b => b.Room)
-            .FirstOrDefaultAsync(i => i.Id == id);
+            .FirstOrDefaultAsync(i => i.InvoiceId == id);
 
         return invoice == null ? null : MapToDto(invoice);
     }
@@ -70,14 +70,14 @@ public class InvoiceService : IInvoiceService
     {
         var invoice = await _context.Invoices
             .Include(i => i.Booking)
-            .FirstOrDefaultAsync(i => i.Id == invoiceId);
+            .FirstOrDefaultAsync(i => i.InvoiceId == invoiceId);
 
         if (invoice == null) return false;
 
         // Create a payment record
         var payment = new PaymentRecord
         {
-            InvoiceId = invoice.Id,
+            InvoiceId = invoice.InvoiceId,
             AmountPaid = amountPaid,
             PaymentDate = DateTime.UtcNow,
             PaymentMethod = paymentMethod
@@ -114,7 +114,7 @@ public class InvoiceService : IInvoiceService
     {
         return new InvoiceDto
         {
-            Id = invoice.Id,
+            InvoiceId = invoice.InvoiceId,
             AmountDue = invoice.AmountDue,
             IssueDate = invoice.IssueDate,
             Status = invoice.Status,
