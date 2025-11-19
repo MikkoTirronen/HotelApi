@@ -41,32 +41,39 @@ public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContex
             new Room { RoomId = 2, RoomNumber = "102", BaseCapacity = 1, PricePerNight = 100, MaxExtraBeds = 1 },
             new Room { RoomId = 3, RoomNumber = "103", BaseCapacity = 1, PricePerNight = 100, MaxExtraBeds = 1 },
             new Room { RoomId = 4, RoomNumber = "201", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 0 },
-            new Room { RoomId = 5, RoomNumber = "202", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 1 },
-            new Room { RoomId = 6, RoomNumber = "203", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 2 }
-
+            new Room { RoomId = 5, RoomNumber = "202", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 0 },
+            new Room { RoomId = 6, RoomNumber = "203", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 2 },
+            new Room { RoomId = 7, RoomNumber = "204", BaseCapacity = 2, PricePerNight = 150, MaxExtraBeds = 2 }
         );
 
-        // ----- Customers -----
+        // ----- Customers (Looney Tunes) -----
         modelBuilder.Entity<Customer>().HasData(
-            new Customer { CustomerId = 1, Name = "John Doe", Email = "john@example.com", Phone = "111-222" },
-            new Customer { CustomerId = 2, Name = "Sarah Connor", Email = "sarah@example.com", Phone = "333-444" }
+            new Customer { CustomerId = 1, Name = "Bugs Bunny", Email = "bugs@looneytunes.com", Phone = "123-456" },
+            new Customer { CustomerId = 2, Name = "Daffy Duck", Email = "daffy@looneytunes.com", Phone = "234-567" },
+            new Customer { CustomerId = 3, Name = "Porky Pig", Email = "porky@looneytunes.com", Phone = "345-678" },
+            new Customer { CustomerId = 4, Name = "Tweety Bird", Email = "tweety@looneytunes.com", Phone = "456-789" },
+            new Customer { CustomerId = 5, Name = "Sylvester", Email = "sylvester@looneytunes.com", Phone = "567-890" }
         );
 
-        // ----- Bookings (must reference valid Room + Customer) -----
+        // Common dates for the week-long stay
+        var start = new DateTime(2025, 11, 17, 0, 0, 0, DateTimeKind.Utc);
+        var end = new DateTime(2025, 11, 24, 0, 0, 0, DateTimeKind.Utc);
+
+        // ----- Bookings -----
         modelBuilder.Entity<Booking>().HasData(
             new Booking
             {
                 BookingId = 1,
                 RoomId = 1,
                 CustomerId = 1,
-                StartDate = new DateTime(2024, 2, 4, 0, 0, 0, DateTimeKind.Utc),
-                EndDate = new DateTime(2024, 2, 5, 0, 0, 0, DateTimeKind.Utc),
-                NumPersons = 2,
+                StartDate = start,
+                EndDate = end,
+                NumPersons = 1,
                 Status = BookingStatus.Confirmed,
-                TotalPrice = 240,
+                TotalPrice = 80 * 7,
                 ExtraBedsCount = 0,
-                CreatedAt = new DateTime(2025, 1, 11, 0, 0, 0, DateTimeKind.Utc),
-                UpdatedAt = new DateTime(2025, 1, 11, 0, 0, 0, DateTimeKind.Utc),
+                CreatedAt = start,
+                UpdatedAt = start,
                 InvoiceId = 1
             },
             new Booking
@@ -74,48 +81,106 @@ public class HotelDbContext(DbContextOptions<HotelDbContext> options) : DbContex
                 BookingId = 2,
                 RoomId = 2,
                 CustomerId = 2,
-                StartDate = new DateTime(2024, 3, 2, 0, 0, 0, DateTimeKind.Utc),
-                EndDate = new DateTime(2024, 3, 5, 0, 0, 0, DateTimeKind.Utc),
-                NumPersons = 3,
-                Status = BookingStatus.Pending,
-                TotalPrice = 500,
-                ExtraBedsCount = 1,
-                CreatedAt = new DateTime(2025, 2, 5, 0, 0, 0, DateTimeKind.Utc),
-                UpdatedAt = new DateTime(2025, 2, 6, 0, 0, 0, DateTimeKind.Utc),
+                StartDate = start,
+                EndDate = end,
+                NumPersons = 1,
+                Status = BookingStatus.Confirmed,
+                TotalPrice = 100 * 7,
+                ExtraBedsCount = 0,
+                CreatedAt = start,
+                UpdatedAt = start,
                 InvoiceId = 2
+            },
+            new Booking
+            {
+                BookingId = 3,
+                RoomId = 3,
+                CustomerId = 3,
+                StartDate = start,
+                EndDate = end,
+                NumPersons = 1,
+                Status = BookingStatus.Confirmed,
+                TotalPrice = 100 * 7,
+                ExtraBedsCount = 0,
+                CreatedAt = start,
+                UpdatedAt = start,
+                InvoiceId = 3
+            },
+            new Booking
+            {
+                BookingId = 4,
+                RoomId = 4,
+                CustomerId = 4,
+                StartDate = start,
+                EndDate = end,
+                NumPersons = 2,
+                Status = BookingStatus.Confirmed,
+                TotalPrice = 150 * 7,
+                ExtraBedsCount = 0,
+                CreatedAt = start,
+                UpdatedAt = start,
+                InvoiceId = 4
+            },
+            new Booking
+            {
+                BookingId = 5,
+                RoomId = 5,
+                CustomerId = 5,
+                StartDate = start,
+                EndDate = end,
+                NumPersons = 2,
+                Status = BookingStatus.Confirmed,
+                TotalPrice = 150 * 7,
+                ExtraBedsCount = 0,
+                CreatedAt = start,
+                UpdatedAt = start,
+                InvoiceId = 5
             }
         );
 
-        // ----- Invoices (must reference BookingId) -----
+        // ----- Invoices -----
         modelBuilder.Entity<Invoice>().HasData(
             new Invoice
             {
                 InvoiceId = 1,
                 BookingId = 1,
-                AmountDue = 240,
-                IssueDate = new DateTime(2024, 2, 1, 0, 0, 0, DateTimeKind.Utc),
+                AmountDue = 80 * 7,
+                IssueDate = start,
                 Status = InvoiceStatus.Unpaid
             },
             new Invoice
             {
                 InvoiceId = 2,
                 BookingId = 2,
-                AmountDue = 500,
-                IssueDate = new DateTime(2024, 3, 1, 0, 0, 0, DateTimeKind.Utc),
+                AmountDue = 100 * 7,
+                IssueDate = start,
+                Status = InvoiceStatus.Unpaid
+            },
+            new Invoice
+            {
+                InvoiceId = 3,
+                BookingId = 3,
+                AmountDue = 100 * 7,
+                IssueDate = start,
+                Status = InvoiceStatus.Unpaid
+            },
+            new Invoice
+            {
+                InvoiceId = 4,
+                BookingId = 4,
+                AmountDue = 150 * 7,
+                IssueDate = start,
+                Status = InvoiceStatus.Unpaid
+            },
+            new Invoice
+            {
+                InvoiceId = 5,
+                BookingId = 5,
+                AmountDue = 150 * 7,
+                IssueDate = start,
                 Status = InvoiceStatus.Unpaid
             }
         );
 
-        // ----- Payments -----
-        modelBuilder.Entity<PaymentRecord>().HasData(
-            new PaymentRecord
-            {
-                PaymentId = 1,
-                InvoiceId = 1,
-                AmountPaid = 240m,
-                PaymentDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                PaymentMethod = "Credit Card"
-            }
-        );
     }
 }
