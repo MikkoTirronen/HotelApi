@@ -27,7 +27,7 @@ public static class RoomEndpoints
             return Results.Created($"/{created.RoomId}", created);
         });
 
-        group.MapPut("/", async (int id, [FromBody] UpdateRoomDto room, IRoomService service) =>
+        group.MapPut("/{id:int}", async (int id, [FromBody] UpdateRoomDto room, IRoomService service) =>
         {
             var updated = await service.UpdateRoomAsync(id, room);
             return updated != null ? Results.Ok(updated) : Results.NotFound();
