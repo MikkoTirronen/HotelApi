@@ -3,6 +3,9 @@ using HotelApi.src.HotelApi.Data.Interfaces;
 using HotelApi.src.HotelApi.Domain.DTOs;
 using HotelApi.src.HotelApi.Domain.Entities;
 using HotelApi.src.HotelApi.Domain.Enums;
+using Microsoft.AspNetCore.Mvc.Filters;
+
+namespace HotelApi.src.HotelApi.Core.Services;
 
 public class BookingService : IBookingService
 {
@@ -101,7 +104,8 @@ public class BookingService : IBookingService
             StartDate = dto.StartDate,
             EndDate = dto.EndDate,
             NumPersons = dto.NumPersons,
-            Status = BookingStatus.Pending
+            Status = BookingStatus.Pending,
+            TotalPrice = total,
         };
 
         await _bookingRepository.AddAsync(booking);
@@ -132,39 +136,44 @@ public class BookingService : IBookingService
 
 
 
-    public async Task<BookingDto?> UpdateBookingAsync(int id, UpdateBookingDto dto)
+    public async Task<BookingDto> UpdateBookingAsync(int bookingId, UpdateBookingDto dto)
     {
-        var booking = await _bookingRepository.GetByIdWithIncludesAsync(id);
-        if (booking == null) return null;
+        var booking = await _bookingRepository.GetByIdWithIncludesAsync(bookingId)
+            ?? throw new Exception("Booking not found");
 
-        if (dto.RoomId.HasValue)
-            booking.RoomId = dto.RoomId.Value;
+        // Check availability (ignore the booking itself)
+        bool available = await IsRoomAvailableForUpdateAsync(
+            dto.RoomId,
+            dto.StartDate,
+            dto.EndDate,
+            bookingId
+        );
 
-        if (dto.StartDate.HasValue)
-            booking.StartDate = dto.StartDate.Value;
-
-        if (dto.EndDate.HasValue)
-            booking.EndDate = dto.EndDate.Value;
-
-        if (dto.NumPersons.HasValue)
-            booking.NumPersons = dto.NumPersons.Value;
-
-        // Validate availability on update
-        var available = await GetAvailableRoomsAsync(booking.StartDate, booking.EndDate, booking.NumPersons);
-        if (!available.Any(r => r.RoomId == booking.RoomId))
+        if (!available)
             throw new Exception("Room not available for updated dates");
 
-        // Recalculate total
-        var room = await _roomRepository.GetByIdAsync(booking.RoomId);
-        if (room != null)
-            booking.TotalPrice = room.PricePerNight * (booking.EndDate - booking.StartDate).Days;
+        // Update fields
+        var selectedRoom = await _roomRepository.GetByIdAsync(dto.RoomId);
+        booking.RoomId = dto.RoomId;
+        booking.StartDate = dto.StartDate;
+        booking.EndDate = dto.EndDate;
+        booking.NumPersons = dto.NumPersons ?? 0;
+        booking.TotalPrice = CalculatePrice(selectedRoom, dto.StartDate, dto.EndDate);
 
-        _bookingRepository.Update(booking);
         await _bookingRepository.SaveAsync();
 
-        return MapToDto(booking);
+        var full = await _bookingRepository.GetByIdWithIncludesAsync(bookingId);
+        return MapToDto(full!);
     }
 
+    private static decimal CalculatePrice(Room? room, DateTime start, DateTime end)
+    {
+        int nights = (end - start).Days;
+        if (nights <= 0) nights = 1; // fallback to at least 1 night
+        if (room != null)
+            return room.PricePerNight * nights;
+        return 0;
+    }
 
     public async Task<bool> CancelBookingAsync(int id)
     {
@@ -177,39 +186,59 @@ public class BookingService : IBookingService
         return true;
     }
 
+    public async Task<bool> IsRoomAvailableForUpdateAsync(int roomId, DateTime start, DateTime end, int bookingId)
+    {
+        var overlapping = await _bookingRepository.GetBookingsInDateRangeAsync(start, end);
+
+        return !overlapping
+            .Any(b => b.RoomId == roomId && b.BookingId != bookingId);
+    }
 
 
     // Map Booking -> BookingDto
-    private BookingDto MapToDto(Booking b) => new BookingDto
+    public BookingDto MapToDto(Booking b)
     {
-        BookingId = b.BookingId,
-        Customer = b.Customer == null ? new CustomerDto { } : new CustomerDto
+        return new BookingDto
         {
-            CustomerId = b.Customer.CustomerId,
-            Name = b.Customer.Name,
-            Email = b.Customer.Email,
-            Phone = b.Customer.Phone
-        },
-        Room = b.Room == null ? new RoomDto { } : new RoomDto
-        {
-            RoomId = b.Room.RoomId,
-            RoomNumber = b.Room.RoomNumber,
-            PricePerNight = b.Room.PricePerNight,
-            BaseCapacity = b.Room.BaseCapacity,
-            MaxExtraBeds = b.Room.MaxExtraBeds,
-            Amenities = b.Room.Amenities,
-            Active = b.Room.Active
-        },
-        Invoice = b.Invoice == null ? new InvoiceDto { } : new InvoiceDto
-        {
-            InvoiceId = b.Invoice.InvoiceId,
-            AmountDue = b.Invoice.AmountDue,
-            Status = b.Invoice.Status,
-            IssueDate = b.Invoice.IssueDate
-        },
-        NumPersons = b.NumPersons,
-        StartDate = b.StartDate,
-        EndDate = b.EndDate,
-        Status = b.Status
-    };
+            BookingId = b.BookingId,
+            RoomId = b.RoomId,
+            CustomerId = b.CustomerId,
+            StartDate = b.StartDate,
+            EndDate = b.EndDate,
+            NumPersons = b.NumPersons,
+            TotalPrice = b.TotalPrice,
+            Status = b.Status,
+
+            Room = new RoomDto
+            {
+                RoomId = b.Room.RoomId,
+                RoomNumber = b.Room.RoomNumber,
+                PricePerNight = b.Room.PricePerNight,
+                BaseCapacity = b.Room.BaseCapacity,
+                MaxExtraBeds = b.Room.MaxExtraBeds,
+                Amenities = b.Room.Amenities,
+                Active = b.Room.Active
+            },
+
+            Customer = new CustomerDto
+            {
+                CustomerId = b.Customer.CustomerId,
+                Name = b.Customer.Name,
+                Email = b.Customer.Email,
+                Phone = b.Customer.Phone
+            },
+
+            Invoice = b.Invoice == null
+                ? null
+                : new InvoiceDto
+                {
+                    InvoiceId = b.Invoice.InvoiceId,
+                    BookingId = b.Invoice.BookingId,
+                    AmountDue = b.Invoice.AmountDue,
+                    IssueDate = b.Invoice.IssueDate,
+                    Status = b.Invoice.Status
+                }
+        };
+    }
+
 }
