@@ -3,6 +3,7 @@ using System;
 using HotelApi.src.HotelApi.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HotelApi.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    partial class HotelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251119102618_initialCreate")]
+    partial class initialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -407,29 +410,9 @@ namespace HotelApi.Migrations
                             RoomId = 5,
                             Active = true,
                             BaseCapacity = 2,
-                            MaxExtraBeds = 0,
+                            MaxExtraBeds = 1,
                             PricePerNight = 150m,
                             RoomNumber = "202",
-                            Type = 0
-                        },
-                        new
-                        {
-                            RoomId = 6,
-                            Active = true,
-                            BaseCapacity = 2,
-                            MaxExtraBeds = 2,
-                            PricePerNight = 150m,
-                            RoomNumber = "203",
-                            Type = 0
-                        },
-                        new
-                        {
-                            RoomId = 7,
-                            Active = true,
-                            BaseCapacity = 2,
-                            MaxExtraBeds = 2,
-                            PricePerNight = 150m,
-                            RoomNumber = "204",
                             Type = 0
                         });
                 });

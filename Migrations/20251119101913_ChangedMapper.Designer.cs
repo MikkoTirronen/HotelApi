@@ -3,6 +3,7 @@ using System;
 using HotelApi.src.HotelApi.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HotelApi.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    partial class HotelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251119101913_ChangedMapper")]
+    partial class ChangedMapper
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,77 +78,32 @@ namespace HotelApi.Migrations
                         new
                         {
                             BookingId = 1,
-                            CreatedAt = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedAt = new DateTime(2025, 1, 11, 0, 0, 0, 0, DateTimeKind.Utc),
                             CustomerId = 1,
-                            EndDate = new DateTime(2025, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EndDate = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             ExtraBedsCount = 0,
                             InvoiceId = 1,
-                            NumPersons = 1,
+                            NumPersons = 2,
                             RoomId = 1,
-                            StartDate = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            StartDate = new DateTime(2024, 2, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1,
-                            TotalPrice = 560m,
-                            UpdatedAt = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc)
+                            TotalPrice = 240m,
+                            UpdatedAt = new DateTime(2025, 1, 11, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
                             BookingId = 2,
-                            CreatedAt = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedAt = new DateTime(2025, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             CustomerId = 2,
-                            EndDate = new DateTime(2025, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ExtraBedsCount = 0,
+                            EndDate = new DateTime(2024, 3, 5, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ExtraBedsCount = 1,
                             InvoiceId = 2,
-                            NumPersons = 1,
+                            NumPersons = 3,
                             RoomId = 2,
-                            StartDate = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Status = 1,
-                            TotalPrice = 700m,
-                            UpdatedAt = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            BookingId = 3,
-                            CreatedAt = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CustomerId = 3,
-                            EndDate = new DateTime(2025, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ExtraBedsCount = 0,
-                            InvoiceId = 3,
-                            NumPersons = 1,
-                            RoomId = 3,
-                            StartDate = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Status = 1,
-                            TotalPrice = 700m,
-                            UpdatedAt = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            BookingId = 4,
-                            CreatedAt = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CustomerId = 4,
-                            EndDate = new DateTime(2025, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ExtraBedsCount = 0,
-                            InvoiceId = 4,
-                            NumPersons = 2,
-                            RoomId = 4,
-                            StartDate = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Status = 1,
-                            TotalPrice = 1050m,
-                            UpdatedAt = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc)
-                        },
-                        new
-                        {
-                            BookingId = 5,
-                            CreatedAt = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CustomerId = 5,
-                            EndDate = new DateTime(2025, 11, 24, 0, 0, 0, 0, DateTimeKind.Utc),
-                            ExtraBedsCount = 0,
-                            InvoiceId = 5,
-                            NumPersons = 2,
-                            RoomId = 5,
-                            StartDate = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Status = 1,
-                            TotalPrice = 1050m,
-                            UpdatedAt = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc)
+                            StartDate = new DateTime(2024, 3, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 0,
+                            TotalPrice = 500m,
+                            UpdatedAt = new DateTime(2025, 2, 6, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -183,45 +141,18 @@ namespace HotelApi.Migrations
                         {
                             CustomerId = 1,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "bugs@looneytunes.com",
-                            Name = "Bugs Bunny",
-                            Phone = "123-456",
+                            Email = "john@example.com",
+                            Name = "John Doe",
+                            Phone = "111-222",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             CustomerId = 2,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "daffy@looneytunes.com",
-                            Name = "Daffy Duck",
-                            Phone = "234-567",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            CustomerId = 3,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "porky@looneytunes.com",
-                            Name = "Porky Pig",
-                            Phone = "345-678",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            CustomerId = 4,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "tweety@looneytunes.com",
-                            Name = "Tweety Bird",
-                            Phone = "456-789",
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        },
-                        new
-                        {
-                            CustomerId = 5,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "sylvester@looneytunes.com",
-                            Name = "Sylvester",
-                            Phone = "567-890",
+                            Email = "sarah@example.com",
+                            Name = "Sarah Connor",
+                            Phone = "333-444",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
@@ -257,41 +188,17 @@ namespace HotelApi.Migrations
                         new
                         {
                             InvoiceId = 1,
-                            AmountDue = 560m,
+                            AmountDue = 240m,
                             BookingId = 1,
-                            IssueDate = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IssueDate = new DateTime(2024, 2, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1
                         },
                         new
                         {
                             InvoiceId = 2,
-                            AmountDue = 700m,
+                            AmountDue = 500m,
                             BookingId = 2,
-                            IssueDate = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Status = 1
-                        },
-                        new
-                        {
-                            InvoiceId = 3,
-                            AmountDue = 700m,
-                            BookingId = 3,
-                            IssueDate = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Status = 1
-                        },
-                        new
-                        {
-                            InvoiceId = 4,
-                            AmountDue = 1050m,
-                            BookingId = 4,
-                            IssueDate = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Status = 1
-                        },
-                        new
-                        {
-                            InvoiceId = 5,
-                            AmountDue = 1050m,
-                            BookingId = 5,
-                            IssueDate = new DateTime(2025, 11, 17, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IssueDate = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1
                         });
                 });
@@ -322,6 +229,16 @@ namespace HotelApi.Migrations
                     b.HasIndex("InvoiceId");
 
                     b.ToTable("Payments");
+
+                    b.HasData(
+                        new
+                        {
+                            PaymentId = 1,
+                            AmountPaid = 240m,
+                            InvoiceId = 1,
+                            PaymentDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PaymentMethod = "Credit Card"
+                        });
                 });
 
             modelBuilder.Entity("HotelApi.src.HotelApi.Domain.Entities.Room", b =>
@@ -407,7 +324,7 @@ namespace HotelApi.Migrations
                             RoomId = 5,
                             Active = true,
                             BaseCapacity = 2,
-                            MaxExtraBeds = 0,
+                            MaxExtraBeds = 1,
                             PricePerNight = 150m,
                             RoomNumber = "202",
                             Type = 0
@@ -420,16 +337,6 @@ namespace HotelApi.Migrations
                             MaxExtraBeds = 2,
                             PricePerNight = 150m,
                             RoomNumber = "203",
-                            Type = 0
-                        },
-                        new
-                        {
-                            RoomId = 7,
-                            Active = true,
-                            BaseCapacity = 2,
-                            MaxExtraBeds = 2,
-                            PricePerNight = 150m,
-                            RoomNumber = "204",
                             Type = 0
                         });
                 });
