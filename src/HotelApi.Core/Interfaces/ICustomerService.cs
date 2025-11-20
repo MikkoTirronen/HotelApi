@@ -10,4 +10,6 @@ public interface ICustomerService
     Task<CustomerDto> CreateAsync(CreateCustomerDto dto);
     Task<CustomerDto?> UpdateAsync(int id, UpdateCustomerDto dto);
     Task<bool> DeleteAsync(int id);
+
+    Task<List<CustomerDto>> SearchCustomersAsync(string search);
 }

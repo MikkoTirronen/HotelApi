@@ -8,16 +8,16 @@ namespace HotelApi.src.HotelApi.Core.Services;
 
 public class CustomerService : ICustomerService
 {
-    private readonly ICustomerRepository _repo;
+    private readonly ICustomerRepository _customerRepository;
 
-    public CustomerService(ICustomerRepository repo)
+    public CustomerService(ICustomerRepository customerRepository)
     {
-        _repo = repo;
+        _customerRepository = customerRepository;
     }
 
     public async Task<IEnumerable<CustomerDto>> GetAllAsync()
     {
-        var customers = await _repo.GetAllAsync();
+        var customers = await _customerRepository.GetAllAsync();
         return customers.Select(c => new CustomerDto
         {
             CustomerId = c.CustomerId,
@@ -29,7 +29,7 @@ public class CustomerService : ICustomerService
 
     public async Task<CustomerDto?> GetByIdAsync(int id)
     {
-        var c = await _repo.GetByIdAsync(id);
+        var c = await _customerRepository.GetByIdAsync(id);
         if (c == null) return null;
 
         return new CustomerDto
@@ -52,8 +52,8 @@ public class CustomerService : ICustomerService
             UpdatedAt = DateTime.UtcNow
         };
 
-        await _repo.AddAsync(customer);
-        await _repo.SaveAsync();
+        await _customerRepository.AddAsync(customer);
+        await _customerRepository.SaveAsync();
 
         return new CustomerDto
         {
@@ -66,7 +66,7 @@ public class CustomerService : ICustomerService
 
     public async Task<CustomerDto?> UpdateAsync(int id, UpdateCustomerDto dto)
     {
-        var customer = await _repo.GetByIdAsync(id);
+        var customer = await _customerRepository.GetByIdAsync(id);
         if (customer == null) return null;
 
         if (!string.IsNullOrWhiteSpace(dto.Name))
@@ -80,8 +80,8 @@ public class CustomerService : ICustomerService
 
         customer.UpdatedAt = DateTime.UtcNow;
 
-        _repo.Update(customer);
-        await _repo.SaveAsync();
+        _customerRepository.Update(customer);
+        await _customerRepository.SaveAsync();
 
         return new CustomerDto
         {
@@ -94,11 +94,23 @@ public class CustomerService : ICustomerService
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var customer = await _repo.GetByIdAsync(id);
+        var customer = await _customerRepository.GetByIdAsync(id);
         if (customer == null) return false;
 
-        _repo.Delete(customer);
-        await _repo.SaveAsync();
+        _customerRepository.Delete(customer);
+        await _customerRepository.SaveAsync();
         return true;
+    }
+    public async Task<List<CustomerDto>> SearchCustomersAsync(string search)
+    {
+        var customers = await _customerRepository.SearchCustomersAsync(search);
+
+        return customers.Select(c => new CustomerDto
+        {
+            CustomerId = c.CustomerId,
+            Name = c.Name,
+            Email = c.Email,
+            Phone = c.Phone
+        }).ToList();
     }
 }

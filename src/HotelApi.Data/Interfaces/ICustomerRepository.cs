@@ -1,3 +1,4 @@
+using HotelApi.src.HotelApi.Domain.DTOs;
 using HotelApi.src.HotelApi.Domain.Entities;
 
 namespace HotelApi.src.HotelApi.Data.Interfaces;
@@ -11,4 +12,5 @@ public interface ICustomerRepository
     void Update(Customer customer);
     void Delete(Customer customer);
     Task SaveAsync();
+    Task<List<Customer>> SearchCustomersAsync(string search);
 }
