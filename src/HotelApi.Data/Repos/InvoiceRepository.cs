@@ -88,4 +88,28 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
                 .ThenInclude(b => b.Room)
             .FirstOrDefaultAsync(i => i.InvoiceId == id);
     }
+    public async Task<List<Invoice>> SearchInvoicesAsync(int? customerId, InvoiceStatus? status, string? name)
+    {
+        var query = _context.Invoices
+            .Include(i => i.Booking)
+                .ThenInclude(b => b.Customer)
+            .AsQueryable();
+
+        if (customerId.HasValue)
+            query = query.Where(i => i.Booking.Customer.CustomerId == customerId.Value);
+
+        if (status.HasValue)
+            query = query.Where(i => i.Status == status.Value);
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            var search = $"%{name}%";
+            query = query.Where(i =>
+                EF.Functions.ILike(i.Booking.Customer.Name, search));
+        }
+
+        return await query
+            .OrderByDescending(i => i.IssueDate)
+            .ToListAsync();
+    }
 }

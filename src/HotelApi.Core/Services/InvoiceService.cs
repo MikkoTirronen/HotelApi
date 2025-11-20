@@ -85,8 +85,10 @@ public class InvoiceService : IInvoiceService
         invoice.Status = dto.Status.ToLower() switch
         {
             "paid" => InvoiceStatus.Paid,
-            "pending" => InvoiceStatus.Unpaid,
-            "overdue" => InvoiceStatus.Void,
+            "unpaid" => InvoiceStatus.Unpaid,
+            "void" => InvoiceStatus.Void,
+            "partial" => InvoiceStatus.Partial,
+            "unknown" => InvoiceStatus.Unknown,
             _ => invoice.Status
         };
 
@@ -100,7 +102,7 @@ public class InvoiceService : IInvoiceService
             Amount = invoice.AmountDue,
             Status = invoice.Status.ToString().ToLower(),
             IssueDate = invoice.IssueDate,
-            DueDate = (DateTime)invoice.DueDate
+            DueDate = invoice.DueDate
         };
     }
     // public async Task<bool> RegisterPaymentAsync(int invoiceId, decimal amountPaid, string paymentMethod)
@@ -162,6 +164,20 @@ public class InvoiceService : IInvoiceService
 
         return invoicesToVoid.Count;
     }
+    public async Task<List<InvoiceListDto>> SearchInvoicesAsync(int? customerId, InvoiceStatus? status, string? name)
+    {
+        var invoices = await _invoiceRepository.SearchInvoicesAsync(customerId, status, name);
+
+        return invoices.Select(i => new InvoiceListDto
+        {
+            InvoiceId = i.InvoiceId,
+            CustomerName = i.Booking.Customer?.Name ?? string.Empty,
+            Amount = i.AmountDue,
+            Status = i.Status.ToString(),
+            IssueDate = i.IssueDate,
+            DueDate = i.DueDate ?? DateTime.MinValue
+        }).ToList();
+    }
     // public async Task<IEnumerable<InvoiceDto>> GetUnpaidInvoicesOlderThanAsync(int days)
     // {
     //     var cutoff = DateTime.UtcNow.AddDays(-days);
@@ -193,10 +209,11 @@ public class InvoiceService : IInvoiceService
     {
         return status switch
         {
-            InvoiceStatus.Paid => "paid",
-            InvoiceStatus.Unpaid => "pending",
-            InvoiceStatus.Void => "overdue",
-            _ => "pending"
+            InvoiceStatus.Paid => "Paid",
+            InvoiceStatus.Unpaid => "Unpaid",
+            InvoiceStatus.Void => "Void",
+            InvoiceStatus.Partial => "Partial",
+            _ => "Unknown"
         };
     }
     public InvoiceListDto MapToInvoiceListDto(Invoice invoice)

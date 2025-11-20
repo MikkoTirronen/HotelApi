@@ -2,6 +2,7 @@ using HotelApi.src.HotelApi.Core.Interfaces;
 using HotelApi.src.HotelApi.Data.Contexts;
 using HotelApi.src.HotelApi.Domain.DTOs;
 using HotelApi.src.HotelApi.Domain.Entities;
+using HotelApi.src.HotelApi.Domain.Enums;
 
 namespace HotelApi.src.HotelApi.Api.Endpoints;
 
@@ -37,6 +38,22 @@ public static class InvoiceEndpoints
             return updated is null
                 ? Results.NotFound("Invoice not found.")
                 : Results.Ok(updated);
+        });
+
+        app.MapGet("/invoices/search", async (
+            int? customerId,
+            InvoiceStatus? status,
+            string? customerName,
+            IInvoiceService invoiceService
+        ) =>
+        {
+            var results = await invoiceService.SearchInvoicesAsync(
+            customerId,
+            status,
+            customerName
+            );
+
+            return Results.Ok(results);
         });
     }
 }

@@ -1,6 +1,7 @@
 using HotelApi.src.HotelApi.Domain.Entities;
 
 namespace HotelApi.src.HotelApi.Data.Interfaces;
+
 public interface IBookingRepository
 {
     Task<List<Booking>> GetAllWithIncludesAsync(bool includeRoom = true, bool includeCustomer = true, bool includeInvoice = true);
@@ -10,11 +11,11 @@ public interface IBookingRepository
     void Update(Booking booking);
     Task SaveAsync();
     Task<List<Booking>> AdvancedSearchAsync(
-    string? customer,
-    string? room,
-    int? bookingId,
-    DateTime? startDate,
-    DateTime? endDate,
-    int? guests);
+        string? customer,
+        string? room,
+        int? bookingId,
+        DateTime? startDate,
+        DateTime? endDate,
+        int? guests);
     Task<bool> DeleteBookingAsync(int id);
-}   
+}
