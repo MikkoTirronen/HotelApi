@@ -21,7 +21,7 @@ public class BookingRepository : IBookingRepository
         if (includeCustomer) query = query.Include(b => b.Customer);
         if (includeInvoice) query = query.Include(b => b.Invoice);
 
-        return await query.ToListAsync();
+        return await query.OrderBy(p => p.CreatedAt).ToListAsync();
     }
 
     public async Task<Booking?> GetByIdWithIncludesAsync(int id, bool includeRoom = true, bool includeCustomer = true, bool includeInvoice = true)
@@ -49,17 +49,17 @@ public class BookingRepository : IBookingRepository
     public async Task SaveAsync() => await _context.SaveChangesAsync();
 
     public async Task<List<Booking>> AdvancedSearchAsync(
-    string? customer,
-    string? room,
-    int? bookingId,
-    DateTime? startDate,
-    DateTime? endDate,
-    int? guests)
+        string? customer,
+        string? room,
+        int? bookingId,
+        DateTime? startDate,
+        DateTime? endDate,
+        int? guests)
     {
         var queryable = _context.Bookings
-    .Include(b => b.Customer)
-    .Include(b => b.Room)
-    .AsQueryable();
+            .Include(b => b.Customer)
+            .Include(b => b.Room)
+            .AsQueryable();
 
         if (bookingId.HasValue)
         {
