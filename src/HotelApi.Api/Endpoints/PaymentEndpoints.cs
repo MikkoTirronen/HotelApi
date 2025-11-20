@@ -21,5 +21,11 @@ public static class PaymentEndpoints
 
             return Results.Ok(payment);
         });
+
+        app.MapGet("/payments", async (IPaymentService service) =>
+        {
+            var payments = await service.GetAllPaymentsAsync();
+            return Results.Ok(payments);
+        });
     }
 }

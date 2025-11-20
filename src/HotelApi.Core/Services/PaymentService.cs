@@ -1,16 +1,17 @@
 using HotelApi.src.HotelApi.Core.Interfaces;
 using HotelApi.src.HotelApi.Data.Interfaces;
+using HotelApi.src.HotelApi.Domain.DTOs;
 using HotelApi.src.HotelApi.Domain.Entities;
 using HotelApi.src.HotelApi.Domain.Enums;
 
 namespace HotelApi.src.HotelApi.Core.Services
 {
-    public class PaymentService(IGenericRepository<PaymentRecord> paymentRepo, IGenericRepository<Invoice> invoiceRepo) : IPaymentService
+    public class PaymentService(IGenericRepository<PaymentRecord> paymentRepo, IGenericRepository<Invoice> invoiceRepo, IPaymentRepository paymentRepository) : IPaymentService
     {
         private readonly IGenericRepository<PaymentRecord> _paymentRepo = paymentRepo;
         private readonly IGenericRepository<Invoice> _invoiceRepo = invoiceRepo;
-
-        public async Task<PaymentRecord> RegisterPaymentAsync(int invoiceId, string? customer, decimal amount, string? method = null)
+        private readonly IPaymentRepository _paymentRepository = paymentRepository;
+        public async Task<PaymentDto> RegisterPaymentAsync(int invoiceId, string customer, decimal amount, string? method = null)
         {
             var invoice = await _invoiceRepo.GetByIdAsync(invoiceId) ?? throw new Exception("Invoice not found.");
 
@@ -33,7 +34,29 @@ namespace HotelApi.src.HotelApi.Core.Services
             _invoiceRepo.Update(invoice);
             await _invoiceRepo.SaveAsync();
 
-            return payment;
+            return new PaymentDto(
+                PaymentId: payment.PaymentId,
+                InvoiceId: payment.InvoiceId,
+                AmountPaid: payment.AmountPaid,
+                PaymentDate: payment.PaymentDate,
+                PaymentMethod: payment.PaymentMethod,
+                CustomerName: payment.Customer
+            );
         }
+
+        public async Task<IEnumerable<PaymentDto>> GetAllPaymentsAsync()
+        {
+            var list = await _paymentRepository.GetAllPaymentsOrderedAsync();
+
+            return list.Select(p => new PaymentDto(
+                p.PaymentId,
+                p.InvoiceId,
+                p.AmountPaid,
+                p.PaymentDate,
+                p.PaymentMethod,
+                p.Invoice.Booking.Customer.Name
+            ));
+        }
+
     }
 }
