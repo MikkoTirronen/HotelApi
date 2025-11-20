@@ -17,7 +17,7 @@ public class Invoice
     public decimal AmountDue { get; set; }
 
     public DateTime IssueDate { get; set; }
-
+    public DateTime? DueDate { get; set; }
     public InvoiceStatus Status { get; set; } = InvoiceStatus.Unpaid;
     public ICollection<PaymentRecord> Payments { get; set; } = new List<PaymentRecord>();
 }

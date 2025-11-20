@@ -10,7 +10,7 @@ namespace HotelApi.src.HotelApi.Core.Services
         private readonly IGenericRepository<PaymentRecord> _paymentRepo = paymentRepo;
         private readonly IGenericRepository<Invoice> _invoiceRepo = invoiceRepo;
 
-        public async Task<PaymentRecord> RegisterPaymentAsync(int invoiceId, decimal amount, string? method = null)
+        public async Task<PaymentRecord> RegisterPaymentAsync(int invoiceId, string? customer, decimal amount, string? method = null)
         {
             var invoice = await _invoiceRepo.GetByIdAsync(invoiceId) ?? throw new Exception("Invoice not found.");
 
@@ -21,6 +21,7 @@ namespace HotelApi.src.HotelApi.Core.Services
             var payment = new PaymentRecord
             {
                 InvoiceId = invoice.InvoiceId,
+                Customer = customer,
                 AmountPaid = amount,
                 PaymentDate = DateTime.UtcNow,
                 PaymentMethod = method

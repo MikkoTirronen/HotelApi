@@ -1,5 +1,6 @@
 using HotelApi.src.HotelApi.Domain.Entities;
 
+namespace HotelApi.src.HotelApi.Data.Interfaces;
 public interface IBookingRepository
 {
     Task<List<Booking>> GetAllWithIncludesAsync(bool includeRoom = true, bool includeCustomer = true, bool includeInvoice = true);

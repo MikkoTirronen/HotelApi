@@ -136,7 +136,7 @@ public class BookingService : IBookingService
 
 
 
-    public async Task<BookingDto> UpdateBookingAsync(int bookingId, UpdateBookingDto dto)
+    public async Task<BookingDto?> UpdateBookingAsync(int bookingId, UpdateBookingDto dto)
     {
         var booking = await _bookingRepository.GetByIdWithIncludesAsync(bookingId)
             ?? throw new Exception("Booking not found");
