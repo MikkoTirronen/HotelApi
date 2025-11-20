@@ -1,4 +1,6 @@
 using HotelApi.src.HotelApi.Core.Interfaces;
+using HotelApi.src.HotelApi.Data.Contexts;
+using HotelApi.src.HotelApi.Domain.DTOs;
 using HotelApi.src.HotelApi.Domain.Entities;
 
 namespace HotelApi.src.HotelApi.Api.Endpoints;
@@ -11,7 +13,7 @@ public static class InvoiceEndpoints
 
         group.MapGet("/", async (IInvoiceService service) =>
         {
-            return Results.Ok(await service.GetAllInvoicesAsync());
+            return Results.Ok(await service.GetAllInvoiceListAsync());
         });
 
         group.MapGet("/{id:int}", async (int id, IInvoiceService service) =>
@@ -24,6 +26,17 @@ public static class InvoiceEndpoints
         {
             var invoice = await service.GetInvoiceByBookingIdAsync(bookingId);
             return invoice != null ? Results.Ok(invoice) : Results.NotFound();
+        });
+
+        app.MapPut("/invoices", async (
+            InvoiceListDto dto,
+            IInvoiceService invoiceService) =>
+        {
+            var updated = await invoiceService.UpdateInvoiceAsync(dto.InvoiceId, dto);
+
+            return updated is null
+                ? Results.NotFound("Invoice not found.")
+                : Results.Ok(updated);
         });
     }
 }
