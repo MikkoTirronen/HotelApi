@@ -158,8 +158,11 @@ public class InvoiceService : IInvoiceService
         foreach (var invoice in invoicesToVoid)
         {
             invoice.Status = InvoiceStatus.Void;
+            if (invoice.Booking != null)
+            {
+                invoice.Booking.Status = BookingStatus.Canceled;
+            }
         }
-
         await _invoiceRepository.UpdateInvoicesAsync(invoicesToVoid);
 
         return invoicesToVoid.Count;

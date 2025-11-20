@@ -7,8 +7,9 @@ public interface IInvoiceRepository : IGenericRepository<Invoice>
 {
     // Task<IEnumerable<Invoice>> GetInvoicesWithBookingsAsync();
     // Task<Invoice?> GetInvoiceWithBookingsByIdAsync(int id);
+    Task<Invoice?> GetInvoiceWithBookingAsync(int invoiceId);
     Task<IEnumerable<Invoice>> GetAllWithIncludesAsync();
-
+    Task<Invoice?> GetByIdAsync(int id, bool includeBookings = false);
     Task<Invoice?> GetInvoiceWithDetailsAsync(int id);
     Task<Invoice?> GetInvoiceWithCustomerAsync(int id);
     Task<List<Invoice>> GetUnpaidOlderThanAsync(DateTime thresholdDate);

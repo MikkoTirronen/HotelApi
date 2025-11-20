@@ -55,5 +55,24 @@ public static class InvoiceEndpoints
 
             return Results.Ok(results);
         });
+
+        app.MapPost("/invoices/void-unpaid", async (IInvoiceService invoiceService) =>
+        {
+            try
+            {
+                // Call the service to void invoices older than 10 days
+                int count = await invoiceService.VoidOldInvoicesAsync(10);
+
+                return Results.Ok(new { voidedCount = count });
+            }
+            catch (Exception ex)
+            {
+                // Return error if something goes wrong
+                return Results.Problem(ex.Message);
+            }
+        })
+        .WithName("VoidOldInvoices")
+        .WithTags("Invoices");
     }
+
 }

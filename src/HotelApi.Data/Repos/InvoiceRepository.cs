@@ -41,15 +41,15 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
     //         .ToListAsync();
     // }
 
-    // public async Task<Invoice?> GetInvoiceWithBookingsByIdAsync(int id)
-    // {
-    //     return await _context.Invoices
-    //         .Include(i => i.Booking)
-    //         .ThenInclude(b => b.Customer)
-    //         .Include(i => i.Booking)
-    //         .ThenInclude(b => b.Room)
-    //         .FirstOrDefaultAsync(i => i.InvoiceId == id);
-    // }
+    public async Task<Invoice?> GetByIdAsync(int id, bool includeBooking = false)
+    {
+        IQueryable<Invoice> query = _context.Invoices;
+
+        if (includeBooking)
+            query = query.Include(i => i.Booking);
+
+        return await query.FirstOrDefaultAsync(i => i.InvoiceId == id);
+    }
 
     public async Task<IEnumerable<Invoice>> GetAllWithIncludesAsync()
     {
@@ -58,7 +58,14 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
             .ThenInclude(b => b.Customer)
             .ToListAsync();
     }
-
+    public async Task<Invoice?> GetInvoiceWithBookingAsync(int invoiceId)
+    {
+        return await _context.Invoices
+            .Include(i => i.Booking)
+                .ThenInclude(b => b.Customer)
+            .Include(i => i.Payments)
+            .FirstOrDefaultAsync(i => i.InvoiceId == invoiceId);
+    }
     // public async Task<Invoice?> GetByIdWithIncludesAsync(int id)
     // {
     //     return await _context.Invoices
@@ -70,7 +77,7 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
     {
         return await _context.Invoices
             .Where(i => (i.Status == InvoiceStatus.Unpaid || i.Status == InvoiceStatus.Partial)
-                        && i.IssueDate <= thresholdDate)
+                        && i.IssueDate <= thresholdDate).Include(i => i.Booking)
             .ToListAsync();
     }
 
