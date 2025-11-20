@@ -1,5 +1,6 @@
 using HotelApi.src.HotelApi.Core.Interfaces;
 using HotelApi.src.HotelApi.Data.Contexts;
+using HotelApi.src.HotelApi.Data.Interfaces;
 using HotelApi.src.HotelApi.Domain.DTOs;
 using HotelApi.src.HotelApi.Domain.Entities;
 using HotelApi.src.HotelApi.Domain.Enums;
@@ -8,45 +9,48 @@ using Microsoft.EntityFrameworkCore;
 public class InvoiceService : IInvoiceService
 {
     private readonly HotelDbContext _context;
-
-    public InvoiceService(HotelDbContext context)
+    private readonly IInvoiceRepository _invoiceRepository;
+    public InvoiceService(HotelDbContext context, IInvoiceRepository invoiceRepository)
     {
         _context = context;
+        _invoiceRepository = invoiceRepository;
     }
-
-    public async Task<IEnumerable<InvoiceDto>> GetAllInvoicesAsync()
+    public async Task<IEnumerable<InvoiceListDto>> GetAllInvoiceListAsync()
     {
-        var invoices = await _context.Invoices
-            .Include(i => i.Booking)
-                .ThenInclude(b => b.Customer)
-            .Include(i => i.Booking)
-                .ThenInclude(b => b.Room)
-            .ToListAsync();
-
-        return invoices.Select(MapToDto).ToList();
+        var invoices = await _invoiceRepository.GetAllWithIncludesAsync();
+        return invoices.Select(MapToInvoiceListDto);
     }
+
+    // public async Task<InvoiceListDto?> GetInvoiceListByIdAsync(int id)
+    // {
+    //     var invoice = await _invoiceRepository.GetByIdWithIncludesAsync(id);
+    //     return invoice == null ? null : MapToInvoiceListDto(invoice);
+    // }
+
+    // public async Task<IEnumerable<InvoiceDto>> GetAllInvoicesAsync()
+    // {
+    //     var invoices = await _context.Invoices
+    //         .Include(i => i.Booking)
+    //             .ThenInclude(b => b.Customer)
+    //         .Include(i => i.Booking)
+    //             .ThenInclude(b => b.Room)
+    //         .ToListAsync();
+
+    //     return invoices.Select(MapToDto).ToList();
+    // }
 
     public async Task<InvoiceDto?> GetInvoiceByIdAsync(int id)
     {
-        var invoice = await _context.Invoices
-            .Include(i => i.Booking)
-                .ThenInclude(b => b.Customer)
-            .Include(i => i.Booking)
-                .ThenInclude(b => b.Room)
-            .FirstOrDefaultAsync(i => i.InvoiceId == id);
+        var invoice = await _invoiceRepository.GetInvoiceWithDetailsAsync(id);
 
-        return invoice == null ? null : MapToDto(invoice);
+        if (invoice == null) return null;
+
+        return MapToDto(invoice);
     }
 
     public async Task<InvoiceDto?> GetInvoiceByBookingIdAsync(int bookingId)
     {
-        var invoice = await _context.Invoices
-            .Include(i => i.Booking)
-                .ThenInclude(b => b.Customer)
-            .Include(i => i.Booking)
-                .ThenInclude(b => b.Room)
-            .FirstOrDefaultAsync(i => i.BookingId == bookingId);
-
+        var invoice = await _invoiceRepository.GetInvoiceByBookingIdAsync(bookingId);
         return invoice == null ? null : MapToDto(invoice);
     }
 
@@ -66,48 +70,112 @@ public class InvoiceService : IInvoiceService
         return MapToDto(invoice);
     }
 
-    public async Task<bool> RegisterPaymentAsync(int invoiceId, decimal amountPaid, string paymentMethod)
+    public async Task<InvoiceListDto?> UpdateInvoiceAsync(int id, InvoiceListDto dto)
     {
-        var invoice = await _context.Invoices
-            .Include(i => i.Booking)
-            .FirstOrDefaultAsync(i => i.InvoiceId == invoiceId);
+        var invoice = await _invoiceRepository.GetInvoiceWithCustomerAsync(id);
 
-        if (invoice == null) return false;
+        if (invoice == null)
+            return null;
 
-        // Create a payment record
-        var payment = new PaymentRecord
+        // Update invoice values
+        invoice.AmountDue = dto.Amount;
+        invoice.IssueDate = dto.IssueDate;
+        invoice.DueDate = dto.DueDate;
+
+        invoice.Status = dto.Status.ToLower() switch
         {
-            InvoiceId = invoice.InvoiceId,
-            AmountPaid = amountPaid,
-            PaymentDate = DateTime.UtcNow,
-            PaymentMethod = paymentMethod
+            "paid" => InvoiceStatus.Paid,
+            "pending" => InvoiceStatus.Unpaid,
+            "overdue" => InvoiceStatus.Void,
+            _ => invoice.Status
         };
 
-        await _context.Payments.AddAsync(payment);
+        await _invoiceRepository.SaveAsync();
 
-        // Update invoice status
-        invoice.Status = invoice.AmountDue <= amountPaid ? InvoiceStatus.Paid : InvoiceStatus.Unpaid;
-
-        _context.Invoices.Update(invoice);
-        await _context.SaveChangesAsync();
-
-        return true;
+        // return updated DTO
+        return new InvoiceListDto
+        {
+            InvoiceId = invoice.InvoiceId,
+            CustomerName = invoice.Booking.Customer.Name,
+            Amount = invoice.AmountDue,
+            Status = invoice.Status.ToString().ToLower(),
+            IssueDate = invoice.IssueDate,
+            DueDate = (DateTime)invoice.DueDate
+        };
     }
+    // public async Task<bool> RegisterPaymentAsync(int invoiceId, decimal amountPaid, string paymentMethod)
+    // {
+    //     if (amountPaid <= 0)
+    //         throw new ArgumentException("Payment amount must be positive.", nameof(amountPaid));
 
-    public async Task<IEnumerable<InvoiceDto>> GetUnpaidInvoicesOlderThanAsync(int days)
+    //     // Load invoice with payments
+    //     var invoice = await _context.Invoices
+    //         .Include(i => i.Payments) // Include payment history
+    //         .FirstOrDefaultAsync(i => i.InvoiceId == invoiceId);
+
+    //     if (invoice == null) return false;
+
+    //     // Calculate total paid so far
+    //     var totalPaid = invoice.Payments.Sum(p => p.AmountPaid);
+
+    //     // Prevent overpayment
+    //     if (totalPaid + amountPaid > invoice.AmountDue)
+    //         throw new InvalidOperationException("Payment exceeds invoice amount.");
+
+    //     // Create new payment record
+    //     var payment = new PaymentRecord
+    //     {
+    //         InvoiceId = invoice.InvoiceId,
+    //         AmountPaid = amountPaid,
+    //         PaymentDate = DateTime.UtcNow,
+    //         PaymentMethod = paymentMethod
+    //     };
+    //     await _context.Payments.AddAsync(payment);
+
+    //     // Update invoice status based on cumulative payments
+    //     var newTotalPaid = totalPaid + amountPaid;
+    //     if (newTotalPaid == invoice.AmountDue)
+    //         invoice.Status = InvoiceStatus.Paid;
+    //     else if (newTotalPaid > 0)
+    //         invoice.Status = InvoiceStatus.Partial;
+    //     else
+    //         invoice.Status = InvoiceStatus.Unpaid;
+
+    //     // Save everything in a single transaction
+    //     await _context.SaveChangesAsync();
+
+    //     return true;
+    // }
+
+    public async Task<int> VoidOldInvoicesAsync(int daysThreshold = 10)
     {
-        var cutoff = DateTime.UtcNow.AddDays(-days);
+        var thresholdDate = DateTime.UtcNow.AddDays(-daysThreshold);
 
-        var invoices = await _context.Invoices
-            .Include(i => i.Booking)
-                .ThenInclude(b => b.Customer)
-            .Include(i => i.Booking)
-                .ThenInclude(b => b.Room)
-            .Where(i => i.Status != InvoiceStatus.Paid && i.IssueDate < cutoff)
-            .ToListAsync();
+        var invoicesToVoid = await _invoiceRepository.GetUnpaidOlderThanAsync(thresholdDate);
 
-        return invoices.Select(MapToDto).ToList();
+        foreach (var invoice in invoicesToVoid)
+        {
+            invoice.Status = InvoiceStatus.Void;
+        }
+
+        await _invoiceRepository.UpdateInvoicesAsync(invoicesToVoid);
+
+        return invoicesToVoid.Count;
     }
+    // public async Task<IEnumerable<InvoiceDto>> GetUnpaidInvoicesOlderThanAsync(int days)
+    // {
+    //     var cutoff = DateTime.UtcNow.AddDays(-days);
+
+    //     var invoices = await _context.Invoices
+    //         .Include(i => i.Booking)
+    //             .ThenInclude(b => b.Customer)
+    //         .Include(i => i.Booking)
+    //             .ThenInclude(b => b.Room)
+    //         .Where(i => i.Status != InvoiceStatus.Paid && i.IssueDate < cutoff)
+    //         .ToListAsync();
+
+    //     return invoices.Select(MapToDto).ToList();
+    // }
 
     // Helper mapping function
     private static InvoiceDto MapToDto(Invoice invoice)
@@ -119,31 +187,28 @@ public class InvoiceService : IInvoiceService
             IssueDate = invoice.IssueDate,
             Status = invoice.Status,
             BookingId = invoice.BookingId
-            // Booking = invoice.Booking == null ? null : new BookingDto
-            // {
-            //     Id = invoice.Booking.Id,
-            //     StartDate = invoice.Booking.StartDate,
-            //     EndDate = invoice.Booking.EndDate,
-            //     NumPersons = invoice.Booking.NumPersons,
-            //     Status = (InvoiceStatus)invoice.Booking.Status,
-            //     Customer = new CustomerDto
-            //     {
-            //         Id = invoice.Booking.Customer.Id,
-            //         FirstName = invoice.Booking.Customer.FirstName,
-            //         LastName = invoice.Booking.Customer.LastName,
-            //         Email = invoice.Booking.Customer.Email,
-            //         Phone = invoice.Booking.Customer.Phone
-            //     },
-            //     Room = new RoomDto
-            //     {
-            //         Id = invoice.Booking.Room.Id,
-            //         RoomNumber = invoice.Booking.Room.RoomNumber,
-            //         PricePerNight = invoice.Booking.Room.PricePerNight,
-            //         BaseCapacity = invoice.Booking.Room.BaseCapacity,
-            //         MaxExtraBeds = invoice.Booking.Room.MaxExtraBeds,
-            //         Amenities = invoice.Booking.Room.Amenities
-            //     }
-            // }
+        };
+    }
+    private string MapInvoiceStatus(InvoiceStatus status)
+    {
+        return status switch
+        {
+            InvoiceStatus.Paid => "paid",
+            InvoiceStatus.Unpaid => "pending",
+            InvoiceStatus.Void => "overdue",
+            _ => "pending"
+        };
+    }
+    public InvoiceListDto MapToInvoiceListDto(Invoice invoice)
+    {
+        return new InvoiceListDto
+        {
+            InvoiceId = invoice.InvoiceId,
+            CustomerName = invoice.Booking.Customer.Name,
+            Amount = invoice.AmountDue,
+            Status = MapInvoiceStatus(invoice.Status),
+            IssueDate = invoice.IssueDate,
+            DueDate = invoice.IssueDate.AddDays(10) // example: 2-week due date
         };
     }
 }
