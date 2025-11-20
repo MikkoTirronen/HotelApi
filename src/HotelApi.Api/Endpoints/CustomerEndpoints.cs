@@ -35,5 +35,16 @@ public static class CustomerEndpoints
             var deleted = await service.DeleteAsync(id);
             return deleted ? Results.NoContent() : Results.NotFound();
         });
+
+        group.MapGet("/search", async (string? query, ICustomerService service) =>
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Results.Ok(new List<CustomerDto>()); // empty list
+
+            var results = await service.SearchCustomersAsync(query);
+
+            return Results.Ok(results);
+        });
+
     }
 }
