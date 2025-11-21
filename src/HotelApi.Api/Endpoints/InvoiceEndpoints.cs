@@ -29,7 +29,7 @@ public static class InvoiceEndpoints
             return invoice != null ? Results.Ok(invoice) : Results.NotFound();
         });
 
-        app.MapPut("/invoices", async (
+        group.MapPut("/", async (
             InvoiceListDto dto,
             IInvoiceService invoiceService) =>
         {
@@ -40,7 +40,7 @@ public static class InvoiceEndpoints
                 : Results.Ok(updated);
         });
 
-        app.MapGet("/invoices/search", async (
+        group.MapGet("/search", async (
             int? customerId,
             InvoiceStatus? status,
             string? customerName,
@@ -56,7 +56,7 @@ public static class InvoiceEndpoints
             return Results.Ok(results);
         });
 
-        app.MapPost("/invoices/void-unpaid", async (IInvoiceService invoiceService) =>
+        app.MapPost("/void-unpaid", async (IInvoiceService invoiceService) =>
         {
             try
             {

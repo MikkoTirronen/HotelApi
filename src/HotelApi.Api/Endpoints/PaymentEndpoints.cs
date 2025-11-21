@@ -7,7 +7,9 @@ public static class PaymentEndpoints
 {
     public static void MapPaymentEndpoints(this WebApplication app)
     {
-        app.MapPost("/payments", async (
+        var group = app.MapGroup("/payments").WithTags("Payments");
+
+        group.MapPost("/", async (
             RegisterPaymentDto request,
             IPaymentService paymentService
         ) =>
@@ -22,7 +24,7 @@ public static class PaymentEndpoints
             return Results.Ok(payment);
         });
 
-        app.MapGet("/payments", async (IPaymentService service) =>
+        group.MapGet("/", async (IPaymentService service) =>
         {
             var payments = await service.GetAllPaymentsAsync();
             return Results.Ok(payments);
