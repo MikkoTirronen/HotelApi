@@ -12,7 +12,7 @@ public class BookingDto
     public DateTime EndDate { get; set; }
     public int NumPersons { get; set; }
     public decimal TotalPrice { get; set; }
-
+    public int? ExtraBedsCount { get; set; }
     public BookingStatus Status { get; set; }
 
     public RoomDto? Room { get; set; }

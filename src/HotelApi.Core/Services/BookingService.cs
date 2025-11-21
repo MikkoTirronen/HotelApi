@@ -106,6 +106,7 @@ public class BookingService : IBookingService
             NumPersons = dto.NumPersons,
             Status = BookingStatus.Pending,
             TotalPrice = total,
+            ExtraBedsCount = dto.ExtraBedsCount ?? 0,
         };
 
         await _bookingRepository.AddAsync(booking);
@@ -159,7 +160,7 @@ public class BookingService : IBookingService
         booking.EndDate = dto.EndDate;
         booking.NumPersons = dto.NumPersons ?? 0;
         booking.TotalPrice = CalculatePrice(selectedRoom, dto.StartDate, dto.EndDate);
-
+        booking.ExtraBedsCount = dto.ExtraBedsCount ?? 0;
         await _bookingRepository.SaveAsync();
 
         var full = await _bookingRepository.GetByIdWithIncludesAsync(bookingId);
@@ -217,7 +218,7 @@ public class BookingService : IBookingService
             NumPersons = b.NumPersons,
             TotalPrice = b.TotalPrice,
             Status = b.Status,
-
+            ExtraBedsCount = b.ExtraBedsCount,
             Room = new RoomDto
             {
                 RoomId = b.Room.RoomId,
