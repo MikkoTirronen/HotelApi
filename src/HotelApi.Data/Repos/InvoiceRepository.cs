@@ -31,15 +31,6 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
                 .ThenInclude(b => b.Room)
             .FirstOrDefaultAsync(i => i.BookingId == bookingId);
     }
-    // public async Task<IEnumerable<Invoice>> GetInvoicesWithBookingsAsync()
-    // {
-    //     return await _context.Invoices
-    //         .Include(i => i.Booking)
-    //         .ThenInclude(b => b.Customer)
-    //         .Include(i => i.Booking)
-    //         .ThenInclude(b => b.Room)
-    //         .ToListAsync();
-    // }
 
     public async Task<Invoice?> GetByIdAsync(int id, bool includeBooking = false)
     {
@@ -66,13 +57,6 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
             .Include(i => i.Payments)
             .FirstOrDefaultAsync(i => i.InvoiceId == invoiceId);
     }
-    // public async Task<Invoice?> GetByIdWithIncludesAsync(int id)
-    // {
-    //     return await _context.Invoices
-    //         .Include(i => i.Booking)
-    //         .ThenInclude(b => b.Customer)
-    //         .FirstOrDefaultAsync(i => i.InvoiceId == id);
-    // }
     public async Task<List<Invoice>> GetUnpaidOlderThanAsync(DateTime thresholdDate)
     {
         return await _context.Invoices

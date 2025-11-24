@@ -12,7 +12,7 @@ public interface IBookingService
     Task<BookingDto> CreateBookingAsync(CreateBookingWithCustomerDto dto);
     Task<BookingDto?> UpdateBookingAsync(int id, UpdateBookingDto updatedBooking);
     // Task<BookingDto?> UpdateBookingStatusAsync(int id, BookingStatus status);
-    Task<bool> CancelBookingAsync(int id);
+    // Task<bool> CancelBookingAsync(int id);
     Task<bool> DeleteBookingAsync(int id);
     Task<IEnumerable<BookingDto>> AdvancedSearchAsync(
     string? customer,
